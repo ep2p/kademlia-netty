@@ -25,7 +25,13 @@ public class DefaultKademliaNodeServerInitializer<K extends Serializable, V exte
     }
 
     public DefaultKademliaNodeServerInitializer() {
-        this.kademliaMessageHandlerFactory = new KademliaMessageHandlerFactory();
+        this.kademliaMessageHandlerFactory = new KademliaMessageHandlerFactory(){
+
+            @Override
+            public <K extends Serializable, V extends Serializable> AbstractKademliaMessageHandler getKademliaMessageHandler(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI) {
+                return new NettyKademliaMessageHandler<K, V>(dhtKademliaNodeAPI);
+            }
+        };
     }
 
     @Override
