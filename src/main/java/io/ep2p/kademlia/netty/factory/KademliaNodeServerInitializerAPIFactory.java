@@ -1,4 +1,4 @@
-package io.ep2p.kademlia.netty.configuration;
+package io.ep2p.kademlia.netty.factory;
 
 import io.ep2p.kademlia.netty.server.DefaultKademliaNodeServerInitializer;
 import io.ep2p.kademlia.netty.server.KademliaNodeServerInitializerAPI;

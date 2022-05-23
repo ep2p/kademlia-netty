@@ -1,4 +1,4 @@
-package io.ep2p.kademlia.netty.configuration;
+package io.ep2p.kademlia.netty.factory;
 
 import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
 import io.ep2p.kademlia.netty.server.AbstractKademliaMessageHandler;

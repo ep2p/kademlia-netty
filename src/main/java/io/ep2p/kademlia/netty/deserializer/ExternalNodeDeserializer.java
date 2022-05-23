@@ -1,4 +1,4 @@
-package io.ep2p.kademlia.netty.configuration.deserializer;
+package io.ep2p.kademlia.netty.deserializer;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;

@@ -1,6 +1,6 @@
 package io.ep2p.kademlia.netty.server;
 
-import io.ep2p.kademlia.netty.configuration.KademliaNodeServerInitializerAPIFactory;
+import io.ep2p.kademlia.netty.factory.KademliaNodeServerInitializerAPIFactory;
 import io.ep2p.kademlia.node.DHTKademliaNodeAPI;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
