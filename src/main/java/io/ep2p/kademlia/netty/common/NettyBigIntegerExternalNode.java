@@ -1,4 +1,4 @@
-package common;
+package io.ep2p.kademlia.netty.common;
 
 import io.ep2p.kademlia.node.Node;
 import lombok.Getter;

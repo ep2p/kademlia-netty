@@ -1,8 +1,8 @@
-package configuration;
+package io.ep2p.kademlia.netty.configuration;
 
-import common.NettyConnectionInfo;
+import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
 import io.ep2p.kademlia.node.DHTKademliaNodeAPI;
-import server.AbstractKademliaMessageHandler;
+import io.ep2p.kademlia.netty.server.AbstractKademliaMessageHandler;
 
 import java.io.Serializable;
 import java.math.BigInteger;

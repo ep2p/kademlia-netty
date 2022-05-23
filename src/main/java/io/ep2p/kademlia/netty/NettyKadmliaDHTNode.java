@@ -1,8 +1,10 @@
-import common.NettyConnectionInfo;
+package io.ep2p.kademlia.netty;
+
+import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
 import io.ep2p.kademlia.node.DHTKademliaNodeAPI;
 import io.ep2p.kademlia.node.DHTKademliaNodeAPIDecorator;
 import lombok.Getter;
-import server.KademliaNodeServer;
+import io.ep2p.kademlia.netty.server.KademliaNodeServer;
 
 import java.io.Serializable;
 import java.math.BigInteger;

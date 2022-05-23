@@ -1,16 +1,12 @@
-package configuration.deserializer;
+package io.ep2p.kademlia.netty.configuration.deserializer;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
-import common.NettyBigIntegerExternalNode;
-import common.NettyConnectionInfo;
 import io.ep2p.kademlia.model.LookupAnswer;
-import io.ep2p.kademlia.protocol.message.DHTLookupKademliaMessage;
 import io.ep2p.kademlia.protocol.message.DHTLookupResultKademliaMessage;
 
 import java.io.Serializable;
 import java.lang.reflect.Type;
-import java.math.BigInteger;
 
 public class DHTLookUpResultDeserializer<K extends Serializable, V extends Serializable> implements JsonDeserializer<DHTLookupResultKademliaMessage.DHTLookupResult<K, V>> {
 

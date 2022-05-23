@@ -1,7 +1,7 @@
-package configuration;
+package io.ep2p.kademlia.netty.configuration;
 
-import server.DefaultKademliaNodeServerInitializer;
-import server.KademliaNodeServerInitializerAPI;
+import io.ep2p.kademlia.netty.server.DefaultKademliaNodeServerInitializer;
+import io.ep2p.kademlia.netty.server.KademliaNodeServerInitializerAPI;
 
 import java.io.Serializable;
 

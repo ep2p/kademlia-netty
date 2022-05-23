@@ -1,12 +1,10 @@
-package server;
+package io.ep2p.kademlia.netty.server;
 
-import common.NettyConnectionInfo;
-import configuration.KademliaMessageHandlerFactory;
-import io.ep2p.kademlia.connection.ConnectionInfo;
+import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
+import io.ep2p.kademlia.netty.configuration.KademliaMessageHandlerFactory;
 import io.ep2p.kademlia.node.DHTKademliaNodeAPI;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
-import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.Delimiters;

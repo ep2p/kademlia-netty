@@ -1,11 +1,11 @@
-package configuration.deserializer;
+package io.ep2p.kademlia.netty.configuration.deserializer;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import common.NettyBigIntegerExternalNode;
-import common.NettyConnectionInfo;
+import io.ep2p.kademlia.netty.common.NettyBigIntegerExternalNode;
+import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
 import io.ep2p.kademlia.node.Node;
 import io.ep2p.kademlia.node.external.BigIntegerExternalNode;
 import io.ep2p.kademlia.node.external.ExternalNode;

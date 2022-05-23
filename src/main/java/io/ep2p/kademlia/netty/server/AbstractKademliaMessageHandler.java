@@ -1,6 +1,6 @@
-package server;
+package io.ep2p.kademlia.netty.server;
 
-import common.NettyConnectionInfo;
+import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
 import io.ep2p.kademlia.node.DHTKademliaNodeAPI;
 import io.ep2p.kademlia.protocol.message.KademliaMessage;
 import io.netty.channel.ChannelHandlerContext;

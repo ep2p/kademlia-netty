@@ -1,7 +1,7 @@
-package configuration.deserializer;
+package io.ep2p.kademlia.netty.configuration.deserializer;
 
 import com.google.gson.*;
-import common.NettyBigIntegerExternalNode;
+import io.ep2p.kademlia.netty.common.NettyBigIntegerExternalNode;
 
 import java.lang.reflect.Type;
 
