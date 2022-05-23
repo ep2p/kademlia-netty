@@ -16,19 +16,19 @@ import java.math.BigInteger;
 
 public class DefaultKademliaNodeServerInitializer<K extends Serializable, V extends Serializable> extends ChannelInitializer<SocketChannel> implements KademliaNodeServerInitializerAPI<K, V> {
     protected DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI;
-    private final KademliaMessageHandlerFactory kademliaMessageHandlerFactory;
-    private int frameSize = 8192;
+    private final KademliaMessageHandlerFactory<K, V> kademliaMessageHandlerFactory;
+    private final int FRAME_SIZE = 8192;
 
 
-    public DefaultKademliaNodeServerInitializer(KademliaMessageHandlerFactory kademliaMessageHandlerFactory) {
+    public DefaultKademliaNodeServerInitializer(KademliaMessageHandlerFactory<K, V> kademliaMessageHandlerFactory) {
         this.kademliaMessageHandlerFactory = kademliaMessageHandlerFactory;
     }
 
     public DefaultKademliaNodeServerInitializer() {
-        this.kademliaMessageHandlerFactory = new KademliaMessageHandlerFactory(){
+        this.kademliaMessageHandlerFactory = new KademliaMessageHandlerFactory<K, V>(){
 
             @Override
-            public <K extends Serializable, V extends Serializable> AbstractKademliaMessageHandler getKademliaMessageHandler(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI) {
+            public AbstractKademliaMessageHandler getKademliaMessageHandler(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI) {
                 return new NettyKademliaMessageHandler<K, V>(dhtKademliaNodeAPI);
             }
         };
@@ -47,7 +47,7 @@ public class DefaultKademliaNodeServerInitializer<K extends Serializable, V exte
 
     @Override
     public void pipelineInitializer(ChannelPipeline pipeline) {
-        pipeline.addLast("framer", new DelimiterBasedFrameDecoder(this.frameSize, Delimiters.lineDelimiter()));
+        pipeline.addLast("framer", new DelimiterBasedFrameDecoder(this.FRAME_SIZE, Delimiters.lineDelimiter()));
         pipeline.addLast("decoder", new StringDecoder());
         pipeline.addLast("encoder", new StringEncoder());
         pipeline.addLast("handler", this.kademliaMessageHandlerFactory.getKademliaMessageHandler(this.dhtKademliaNodeAPI));
