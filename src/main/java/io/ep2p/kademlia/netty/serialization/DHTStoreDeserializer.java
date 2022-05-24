@@ -1,4 +1,4 @@
-package io.ep2p.kademlia.netty.deserializer;
+package io.ep2p.kademlia.netty.serialization;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
@@ -16,8 +16,8 @@ public class DHTStoreDeserializer<K extends Serializable, V extends Serializable
     public DHTStoreKademliaMessage.DHTData<BigInteger, NettyConnectionInfo, K, V> deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         DHTStoreKademliaMessage.DHTData<BigInteger, NettyConnectionInfo, K, V> dhtData = new DHTStoreKademliaMessage.DHTData<>();
         JsonObject jsonObject = jsonElement.getAsJsonObject();
-        dhtData.setKey(jsonDeserializationContext.deserialize(jsonObject.getAsJsonObject("key"), new TypeToken<K>() {}.getType()));
-        dhtData.setValue(jsonDeserializationContext.deserialize(jsonObject.getAsJsonObject("value"), new TypeToken<V>() {}.getType()));
+        dhtData.setKey(jsonDeserializationContext.deserialize(jsonObject.get("key"), new TypeToken<K>() {}.getType()));
+        dhtData.setValue(jsonDeserializationContext.deserialize(jsonObject.get("value"), new TypeToken<V>() {}.getType()));
         dhtData.setRequester(jsonDeserializationContext.deserialize(jsonObject.getAsJsonObject("requester"), NettyBigIntegerExternalNode.class));
         return dhtData;
     }

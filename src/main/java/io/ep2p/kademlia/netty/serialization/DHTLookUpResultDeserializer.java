@@ -1,4 +1,4 @@
-package io.ep2p.kademlia.netty.deserializer;
+package io.ep2p.kademlia.netty.serialization;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
@@ -14,8 +14,8 @@ public class DHTLookUpResultDeserializer<K extends Serializable, V extends Seria
     public DHTLookupResultKademliaMessage.DHTLookupResult<K, V> deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         DHTLookupResultKademliaMessage.DHTLookupResult<K, V> dhtLookupResult = new DHTLookupResultKademliaMessage.DHTLookupResult<>();
         JsonObject jsonObject = jsonElement.getAsJsonObject();
-        dhtLookupResult.setKey(jsonDeserializationContext.deserialize(jsonObject.getAsJsonObject("key"), new TypeToken<K>() {}.getType()));
-        dhtLookupResult.setValue(jsonDeserializationContext.deserialize(jsonObject.getAsJsonObject("value"), new TypeToken<V>() {}.getType()));
+        dhtLookupResult.setKey(jsonDeserializationContext.deserialize(jsonObject.get("key"), new TypeToken<K>() {}.getType()));
+        dhtLookupResult.setValue(jsonDeserializationContext.deserialize(jsonObject.get("value"), new TypeToken<V>() {}.getType()));
         dhtLookupResult.setResult(LookupAnswer.Result.valueOf(jsonObject.get("result").getAsString()));
         return dhtLookupResult;
     }

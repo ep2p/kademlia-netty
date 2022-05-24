@@ -1,4 +1,4 @@
-package io.ep2p.kademlia.netty.deserializer;
+package io.ep2p.kademlia.netty.serialization;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
@@ -18,8 +18,8 @@ public class DHTLookUpDeserializer<K extends Serializable> implements JsonDeseri
         JsonObject jsonObject = jsonElement.getAsJsonObject();
         JsonObject requesterJsonObject = jsonObject.getAsJsonObject("requester");
         dhtLookup.setRequester(jsonDeserializationContext.deserialize(requesterJsonObject, NettyBigIntegerExternalNode.class));
-        dhtLookup.setCurrentTry(jsonObject.get("currentTry").getAsInt());
-        dhtLookup.setKey(jsonDeserializationContext.deserialize(jsonObject.getAsJsonObject("key"), new TypeToken<K>() {}.getType()));
+        dhtLookup.setCurrentTry(jsonObject.get("current_try").getAsInt());
+        dhtLookup.setKey(jsonDeserializationContext.deserialize(jsonObject.get("key"), new TypeToken<K>() {}.getType()));
         return dhtLookup;
     }
 }

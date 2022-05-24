@@ -1,9 +1,7 @@
-package io.ep2p.kademlia.netty.deserializer;
+package io.ep2p.kademlia.netty.serialization;
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import io.ep2p.kademlia.netty.common.NettyBigIntegerExternalNode;
 import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
 import io.ep2p.kademlia.node.Node;
@@ -16,9 +14,11 @@ import java.math.BigInteger;
 public class ExternalNodeDeserializer implements JsonDeserializer<ExternalNode<BigInteger, NettyConnectionInfo>> {
     @Override
     public ExternalNode<BigInteger, NettyConnectionInfo> deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-        Node<BigInteger, NettyConnectionInfo> node = (Node<BigInteger, NettyConnectionInfo>) jsonDeserializationContext.deserialize(jsonElement, NettyBigIntegerExternalNode.class);
-        BigInteger distance = jsonElement.getAsJsonObject().get("distance").getAsBigInteger();
+        Type type_ = new TypeToken<NettyBigIntegerExternalNode>(){}.getType();
 
-        return new BigIntegerExternalNode<NettyConnectionInfo>(node, distance);
+        JsonObject jsonObject = jsonElement.getAsJsonObject();
+        Node<BigInteger, NettyConnectionInfo> node = jsonDeserializationContext.deserialize(jsonObject.get("node"), type_);
+        BigInteger distance = jsonObject.get("distance").getAsBigInteger();
+        return new BigIntegerExternalNode<>(node, distance);
     }
 }
