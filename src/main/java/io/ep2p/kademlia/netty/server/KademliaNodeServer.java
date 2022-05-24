@@ -1,5 +1,6 @@
 package io.ep2p.kademlia.netty.server;
 
+import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
 import io.ep2p.kademlia.netty.factory.KademliaNodeServerInitializerAPIFactory;
 import io.ep2p.kademlia.node.DHTKademliaNodeAPI;
 import io.netty.bootstrap.ServerBootstrap;
@@ -9,9 +10,12 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.Getter;
 
+import java.io.Serializable;
+import java.math.BigInteger;
+
 
 @Getter
-public class KademliaNodeServer {
+public class KademliaNodeServer<K extends Serializable, V extends Serializable> {
 
     private final int port;
     private final String host;
@@ -38,11 +42,11 @@ public class KademliaNodeServer {
         this(host, port, new KademliaNodeServerInitializerAPIFactory());
     }
 
-    public synchronized void run(DHTKademliaNodeAPI<?,?,?,?> dhtKademliaNodeAPI) throws InterruptedException {
+    public synchronized void run(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI) throws InterruptedException {
         this.bossGroup = new NioEventLoopGroup();
         this.workerGroup = new NioEventLoopGroup();
 
-        KademliaNodeServerInitializerAPI kademliaNodeServerInitializer = kademliaNodeServerInitializerAPIFactory.getKademliaNodeServerInitializerAPI();
+        KademliaNodeServerInitializerAPI<K, V> kademliaNodeServerInitializer = kademliaNodeServerInitializerAPIFactory.getKademliaNodeServerInitializerAPI();
         kademliaNodeServerInitializer.registerKademliaNode(dhtKademliaNodeAPI);
         try {
             ServerBootstrap bootstrap = new ServerBootstrap()
