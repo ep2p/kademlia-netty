@@ -14,9 +14,9 @@ public class NettyKadmliaDHTNode<K extends Serializable, V extends Serializable>
         extends DHTKademliaNodeAPIDecorator<BigInteger, NettyConnectionInfo, K, V> {
 
     @Getter
-    private final KademliaNodeServer kademliaNodeServer;
+    private final KademliaNodeServer<K, V> kademliaNodeServer;
 
-    public NettyKadmliaDHTNode(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> kademliaNode, KademliaNodeServer kademliaNodeServer) {
+    public NettyKadmliaDHTNode(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> kademliaNode, KademliaNodeServer<K, V> kademliaNodeServer) {
         super(kademliaNode);
         this.kademliaNodeServer = kademliaNodeServer;
     }
