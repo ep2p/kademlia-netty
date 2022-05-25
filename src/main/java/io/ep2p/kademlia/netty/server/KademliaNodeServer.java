@@ -5,6 +5,7 @@ import io.ep2p.kademlia.netty.factory.KademliaNodeServerInitializerAPIFactory;
 import io.ep2p.kademlia.node.DHTKademliaNodeAPI;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -46,13 +47,14 @@ public class KademliaNodeServer<K extends Serializable, V extends Serializable> 
         this.bossGroup = new NioEventLoopGroup();
         this.workerGroup = new NioEventLoopGroup();
 
-        KademliaNodeServerInitializerAPI<K, V> kademliaNodeServerInitializer = kademliaNodeServerInitializerAPIFactory.getKademliaNodeServerInitializerAPI();
+        KademliaNodeServerInitializer<K, V> kademliaNodeServerInitializer = kademliaNodeServerInitializerAPIFactory.getKademliaNodeServerInitializerAPI();
         kademliaNodeServerInitializer.registerKademliaNode(dhtKademliaNodeAPI);
         try {
             ServerBootstrap bootstrap = new ServerBootstrap()
                     .group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
-                    .handler(kademliaNodeServerInitializer);
+                    .handler(kademliaNodeServerInitializer)
+                    .option(ChannelOption.SO_BACKLOG, 128);
 
             ChannelFuture bind = host != null ? bootstrap.bind(host, port) : bootstrap.bind(port);
             bind.sync().channel().closeFuture().sync();

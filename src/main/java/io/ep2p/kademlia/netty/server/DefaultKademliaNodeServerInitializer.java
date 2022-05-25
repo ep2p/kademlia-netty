@@ -5,19 +5,18 @@ import io.ep2p.kademlia.netty.factory.KademliaMessageHandlerFactory;
 import io.ep2p.kademlia.node.DHTKademliaNodeAPI;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.codec.DelimiterBasedFrameDecoder;
-import io.netty.handler.codec.Delimiters;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.HttpServerCodec;
 
 import java.io.Serializable;
 import java.math.BigInteger;
 
-public class DefaultKademliaNodeServerInitializer<K extends Serializable, V extends Serializable> extends ChannelInitializer<SocketChannel> implements KademliaNodeServerInitializerAPI<K, V> {
+public class DefaultKademliaNodeServerInitializer<K extends Serializable, V extends Serializable> extends ChannelInitializer<SocketChannel> implements KademliaNodeServerInitializer<K, V> {
     protected DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI;
     private final KademliaMessageHandlerFactory<K, V> kademliaMessageHandlerFactory;
-    private final int FRAME_SIZE = 8192;
 
 
     public DefaultKademliaNodeServerInitializer(KademliaMessageHandlerFactory<K, V> kademliaMessageHandlerFactory) {
@@ -28,7 +27,7 @@ public class DefaultKademliaNodeServerInitializer<K extends Serializable, V exte
         this.kademliaMessageHandlerFactory = new KademliaMessageHandlerFactory<K, V>(){
 
             @Override
-            public AbstractKademliaMessageHandler getKademliaMessageHandler(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI) {
+            public SimpleChannelInboundHandler<FullHttpRequest> getKademliaMessageHandler(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI) {
                 return new NettyKademliaMessageHandler<K, V>(dhtKademliaNodeAPI);
             }
         };
@@ -47,9 +46,8 @@ public class DefaultKademliaNodeServerInitializer<K extends Serializable, V exte
 
     @Override
     public void pipelineInitializer(ChannelPipeline pipeline) {
-        pipeline.addLast("framer", new DelimiterBasedFrameDecoder(this.FRAME_SIZE, Delimiters.lineDelimiter()));
-        pipeline.addLast("decoder", new StringDecoder());
-        pipeline.addLast("encoder", new StringEncoder());
+        pipeline.addLast(new HttpServerCodec());
+        pipeline.addLast(new HttpObjectAggregator(Integer.MAX_VALUE));
         pipeline.addLast("handler", this.kademliaMessageHandlerFactory.getKademliaMessageHandler(this.dhtKademliaNodeAPI));
     }
 }

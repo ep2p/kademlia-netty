@@ -9,7 +9,7 @@ import io.ep2p.kademlia.protocol.message.KademliaMessage;
 import java.io.Serializable;
 import java.math.BigInteger;
 
-public class NettyKademliaMessageHandler<K extends Serializable, V extends Serializable> extends AbstractKademliaMessageHandler {
+public class NettyKademliaMessageHandler<K extends Serializable, V extends Serializable> extends AbstractKademliaMessageHandler<K, V> {
     private final GsonFactory gsonFactory;
 
     public NettyKademliaMessageHandler(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI) {
@@ -17,7 +17,7 @@ public class NettyKademliaMessageHandler<K extends Serializable, V extends Seria
     }
 
     public NettyKademliaMessageHandler(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI, GsonFactory gsonFactory) {
-        super(dhtKademliaNodeAPI);
+        super(gsonFactory, dhtKademliaNodeAPI);
         this.gsonFactory = gsonFactory;
     }
 

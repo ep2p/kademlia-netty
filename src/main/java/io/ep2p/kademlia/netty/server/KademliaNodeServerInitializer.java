@@ -8,7 +8,7 @@ import io.netty.channel.ChannelPipeline;
 import java.io.Serializable;
 import java.math.BigInteger;
 
-public interface KademliaNodeServerInitializerAPI<K extends Serializable, V extends Serializable> extends ChannelInboundHandler {
+public interface KademliaNodeServerInitializer<K extends Serializable, V extends Serializable> extends ChannelInboundHandler {
     void registerKademliaNode(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI);
     void pipelineInitializer(ChannelPipeline pipeline);
 }
