@@ -111,6 +111,39 @@ public class SerializationTestCase {
     }
 
     @Test
+    public void testEmptyKademliaMessageSerialization(){
+        EmptyKademliaMessage<BigInteger, NettyConnectionInfo> kademliaMessage = new EmptyKademliaMessage<>();
+        kademliaMessage.setNode(node);
+
+        String json = gson.toJson(kademliaMessage);
+        System.out.println(json);
+
+        Type type = new TypeToken<KademliaMessage<BigInteger, NettyConnectionInfo, Serializable>>(){}.getType();
+        KademliaMessage<BigInteger, NettyConnectionInfo, Serializable> kademliaMessage1 = gson.fromJson(json, type);
+        Assertions.assertTrue(kademliaMessage1 instanceof EmptyKademliaMessage);
+        Assertions.assertEquals(kademliaMessage1.getType(), kademliaMessage.getType());
+        Assertions.assertEquals(kademliaMessage1.getNode(), kademliaMessage.getNode());
+        Assertions.assertEquals(kademliaMessage1.getData(), kademliaMessage.getData());
+    }
+
+    @Test
+    public void testFindNodeRequestSerialization(){
+        FindNodeRequestMessage<BigInteger, NettyConnectionInfo> kademliaMessage = new FindNodeRequestMessage<>();
+        kademliaMessage.setNode(node);
+        kademliaMessage.setData(BigInteger.valueOf(100));
+
+        String json = gson.toJson(kademliaMessage);
+        System.out.println(json);
+
+        Type type = new TypeToken<KademliaMessage<BigInteger, NettyConnectionInfo, Serializable>>(){}.getType();
+        KademliaMessage<BigInteger, NettyConnectionInfo, Serializable> kademliaMessage1 = gson.fromJson(json, type);
+        Assertions.assertTrue(kademliaMessage1 instanceof FindNodeRequestMessage);
+        Assertions.assertEquals(kademliaMessage1.getType(), kademliaMessage.getType());
+        Assertions.assertEquals(kademliaMessage1.getNode(), kademliaMessage.getNode());
+        Assertions.assertEquals(kademliaMessage1.getData(), kademliaMessage.getData());
+    }
+
+    @Test
     public void testExternalNodeSerialization(){
         ExternalNode<BigInteger, NettyConnectionInfo> externalNode = new BigIntegerExternalNode<>(node, BigInteger.valueOf(1));
 
