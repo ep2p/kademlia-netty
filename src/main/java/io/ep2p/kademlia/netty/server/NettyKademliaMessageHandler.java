@@ -9,18 +9,18 @@ import io.ep2p.kademlia.protocol.message.KademliaMessage;
 import java.io.Serializable;
 import java.math.BigInteger;
 
-public class NettyKademliaMessageHandler<K extends Serializable, V extends Serializable> extends AbstractKademliaMessageHandler<K, V> {
+public class NettyKademliaMessageHandler<ID extends Number, K extends Serializable, V extends Serializable> extends AbstractKademliaMessageHandler<ID, K, V> {
 
-    public NettyKademliaMessageHandler(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI) {
+    public NettyKademliaMessageHandler(DHTKademliaNodeAPI<ID, NettyConnectionInfo, K, V> dhtKademliaNodeAPI) {
         this(dhtKademliaNodeAPI, new GsonFactory.DefaultGsonFactory());
     }
 
-    public NettyKademliaMessageHandler(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI, GsonFactory gsonFactory) {
+    public NettyKademliaMessageHandler(DHTKademliaNodeAPI<ID, NettyConnectionInfo, K, V> dhtKademliaNodeAPI, GsonFactory gsonFactory) {
         super(gsonFactory, dhtKademliaNodeAPI);
     }
 
     @Override
-    protected KademliaMessage<BigInteger, NettyConnectionInfo, Serializable> toKademliaMessage(String message) {
+    protected KademliaMessage<ID, NettyConnectionInfo, Serializable> toKademliaMessage(String message) {
         return this.GSON.fromJson(
                 message,
                 new TypeToken<KademliaMessage<BigInteger, NettyConnectionInfo, Serializable>>(){}.getType()

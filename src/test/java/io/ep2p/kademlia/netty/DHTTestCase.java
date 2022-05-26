@@ -28,8 +28,8 @@ public class DHTTestCase {
 
     private static NettyMessageSender nettyMessageSender1;
     private static NettyMessageSender nettyMessageSender2;
-    private static NettyKadmliaDHTNode<String, String> node1;
-    private static NettyKadmliaDHTNode<String, String> node2;
+    private static NettyKadmliaDHTNode<BigInteger, String, String> node1;
+    private static NettyKadmliaDHTNode<BigInteger, String, String> node2;
 
 
     @SneakyThrows
@@ -62,7 +62,7 @@ public class DHTTestCase {
                 nettyMessageSender1,
                 nodeSettings, node1Repository, keyHashGenerator
         );
-        KademliaNodeServer<String, String> kademliaNodeServer = new KademliaNodeServer<>("localhost", 8000);
+        KademliaNodeServer<BigInteger, String, String> kademliaNodeServer = new KademliaNodeServer<>("localhost", 8000);
         node1 = new NettyKadmliaDHTNode<>(kademliaNode, kademliaNodeServer);
         node1.start();
 
@@ -80,7 +80,7 @@ public class DHTTestCase {
                 nettyMessageSender2,
                 nodeSettings, node2Repository, keyHashGenerator
         );
-        KademliaNodeServer<String, String> kademliaNodeServer2 = new KademliaNodeServer<>("localhost", 8001);
+        KademliaNodeServer<BigInteger, String, String> kademliaNodeServer2 = new KademliaNodeServer<>("localhost", 8001);
         node2 = new NettyKadmliaDHTNode<>(kademliaNode2, kademliaNodeServer2);
         System.out.println("Bootstrapped? " + node2.start(node1).get(5, TimeUnit.SECONDS));
 

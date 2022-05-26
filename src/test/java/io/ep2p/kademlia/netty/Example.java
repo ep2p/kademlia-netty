@@ -51,8 +51,8 @@ public class Example {
                 nettyMessageSender,
                 nodeSettings, node1Repository, keyHashGenerator
         );
-        KademliaNodeServer<String, String> kademliaNodeServer = new KademliaNodeServer<>("localhost", 8000);
-        NettyKadmliaDHTNode<String, String> node1 = new NettyKadmliaDHTNode<>(kademliaNode, kademliaNodeServer);
+        KademliaNodeServer<BigInteger, String, String> kademliaNodeServer = new KademliaNodeServer<>("localhost", 8000);
+        NettyKadmliaDHTNode<BigInteger, String, String> node1 = new NettyKadmliaDHTNode<>(kademliaNode, kademliaNodeServer);
         node1.start();
 
         Thread.sleep(2000);
@@ -68,8 +68,8 @@ public class Example {
                 nettyMessageSender,
                 nodeSettings, node2Repository, keyHashGenerator
         );
-        KademliaNodeServer<String, String> kademliaNodeServer2 = new KademliaNodeServer<>("localhost", 8001);
-        NettyKadmliaDHTNode<String, String> node2 = new NettyKadmliaDHTNode<>(kademliaNode2, kademliaNodeServer2);
+        KademliaNodeServer<BigInteger, String, String> kademliaNodeServer2 = new KademliaNodeServer<>("localhost", 8001);
+        NettyKadmliaDHTNode<BigInteger, String, String> node2 = new NettyKadmliaDHTNode<>(kademliaNode2, kademliaNodeServer2);
         System.out.println("Bootstrapped? " + node2.start(node1).get(5, TimeUnit.SECONDS));
 
         StoreAnswer<BigInteger, String> storeAnswer = node2.store("K", "V").get();
