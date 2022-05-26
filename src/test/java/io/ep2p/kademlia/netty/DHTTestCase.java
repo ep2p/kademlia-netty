@@ -48,8 +48,8 @@ public class DHTTestCase {
             }
         };
 
-        nettyMessageSender1 = new NettyMessageSender<BigInteger>();
-        nettyMessageSender2 = new NettyMessageSender<BigInteger>();
+        nettyMessageSender1 = new NettyMessageSender();
+        nettyMessageSender2 = new NettyMessageSender();
 
         // node 1
         NettyConnectionInfo nettyConnectionInfo = new NettyConnectionInfo("localhost", 8000);

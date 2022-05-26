@@ -9,7 +9,6 @@ import io.ep2p.kademlia.node.KademliaNodeAPI;
 import io.ep2p.kademlia.node.Node;
 import io.ep2p.kademlia.protocol.MessageType;
 import io.ep2p.kademlia.protocol.message.KademliaMessage;
-import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 
 import java.io.IOException;
@@ -21,9 +20,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-
-@Slf4j
-public class NettyMessageSender<ID extends Number> implements MessageSender<ID, NettyConnectionInfo> {
+public class NettyMessageSender implements MessageSender<BigInteger, NettyConnectionInfo> {
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
     private final Gson gson;
     private final OkHttpClient client;
@@ -52,7 +49,7 @@ public class NettyMessageSender<ID extends Number> implements MessageSender<ID, 
     }
 
     @Override
-    public <I extends Serializable, O extends Serializable> KademliaMessage<ID, NettyConnectionInfo, I> sendMessage(KademliaNodeAPI<ID, NettyConnectionInfo> caller, Node<ID, NettyConnectionInfo> receiver, KademliaMessage<ID, NettyConnectionInfo, O> message) {
+    public <I extends Serializable, O extends Serializable> KademliaMessage<BigInteger, NettyConnectionInfo, I> sendMessage(KademliaNodeAPI<BigInteger, NettyConnectionInfo> caller, Node<BigInteger, NettyConnectionInfo> receiver, KademliaMessage<BigInteger, NettyConnectionInfo, O> message) {
         message.setNode(caller);
 
         RequestBody body = RequestBody.create(gson.toJson(message), JSON);
@@ -63,10 +60,12 @@ public class NettyMessageSender<ID extends Number> implements MessageSender<ID, 
 
         try (Response response = client.newCall(request).execute()) {
             String response_str = Objects.requireNonNull(response.body()).string();
-            return gson.fromJson(response_str, new TypeToken<KademliaMessage<BigInteger, NettyConnectionInfo, Serializable>>() {}.getType());
+            KademliaMessage<BigInteger, NettyConnectionInfo, I> o = gson.fromJson(response_str, new TypeToken<KademliaMessage<BigInteger, NettyConnectionInfo, Serializable>>() {}.getType());
+            return o;
         } catch (IOException e) {
-            log.error(String.format("Failed to send message from node %s to node %s", ""+caller.getId(), ""+receiver.getId()) , e);
-            return new KademliaMessage<ID, NettyConnectionInfo, I>() {
+            //todo
+            e.printStackTrace();
+            return new KademliaMessage<BigInteger, NettyConnectionInfo, I>() {
                 @Override
                 public I getData() {
                     return null;
@@ -78,7 +77,7 @@ public class NettyMessageSender<ID extends Number> implements MessageSender<ID, 
                 }
 
                 @Override
-                public Node<ID, NettyConnectionInfo> getNode() {
+                public Node<BigInteger, NettyConnectionInfo> getNode() {
                     return receiver;
                 }
 
@@ -91,7 +90,7 @@ public class NettyMessageSender<ID extends Number> implements MessageSender<ID, 
     }
 
     @Override
-    public <O extends Serializable> void sendAsyncMessage(KademliaNodeAPI<ID, NettyConnectionInfo> caller, Node<ID, NettyConnectionInfo> receiver, KademliaMessage<ID, NettyConnectionInfo, O> message) {
+    public <O extends Serializable> void sendAsyncMessage(KademliaNodeAPI<BigInteger, NettyConnectionInfo> caller, Node<BigInteger, NettyConnectionInfo> receiver, KademliaMessage<BigInteger, NettyConnectionInfo, O> message) {
         executorService.submit(new Runnable() {
             @Override
             public void run() {
