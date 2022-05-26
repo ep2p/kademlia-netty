@@ -15,7 +15,6 @@ import io.ep2p.kademlia.table.RoutingTableFactory;
 import io.ep2p.kademlia.util.BoundedHashUtil;
 import lombok.SneakyThrows;
 
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -51,6 +50,7 @@ public class Example {
         node1.start();
 
         Thread.sleep(2000);
+
         // node 2
         NettyKadmliaDHTNode<BigInteger, String, String> node2 = new NettyKademliaDHTNodeBuilder<BigInteger, String, String>()
                 .id(BigInteger.valueOf(2))

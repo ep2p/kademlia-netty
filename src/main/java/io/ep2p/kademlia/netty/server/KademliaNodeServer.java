@@ -18,7 +18,7 @@ import java.math.BigInteger;
 
 
 @Getter
-public class KademliaNodeServer<ID extends Number, K extends Serializable, V extends Serializable> {
+public class KademliaNodeServer<K extends Serializable, V extends Serializable> {
 
     private final int port;
     private final String host;
@@ -47,13 +47,13 @@ public class KademliaNodeServer<ID extends Number, K extends Serializable, V ext
         this(host, port, new KademliaNodeServerInitializerAPIFactory());
     }
 
-    public synchronized void run(DHTKademliaNodeAPI<ID, NettyConnectionInfo, K, V> dhtKademliaNodeAPI) {
+    public synchronized void run(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI) {
         assert !running;
 
         this.bossGroup = new NioEventLoopGroup();
         this.workerGroup = new NioEventLoopGroup();
 
-        KademliaNodeServerInitializer<ID, K, V> kademliaNodeServerInitializer = kademliaNodeServerInitializerAPIFactory.getKademliaNodeServerInitializerAPI();
+        KademliaNodeServerInitializer<K, V> kademliaNodeServerInitializer = kademliaNodeServerInitializerAPIFactory.getKademliaNodeServerInitializerAPI();
         kademliaNodeServerInitializer.registerKademliaNode(dhtKademliaNodeAPI);
 
         try {

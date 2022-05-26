@@ -26,22 +26,22 @@ import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
 import static io.netty.handler.codec.http.HttpHeaderValues.APPLICATION_JSON;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public abstract class AbstractKademliaMessageHandler<ID extends Number, K extends Serializable, V extends Serializable> extends SimpleChannelInboundHandler<FullHttpRequest> {
-    private final DHTKademliaNodeAPI<ID, NettyConnectionInfo, K, V> dhtKademliaNodeAPI;
+public abstract class AbstractKademliaMessageHandler<K extends Serializable, V extends Serializable> extends SimpleChannelInboundHandler<FullHttpRequest> {
+    private final DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI;
     protected final Gson GSON;
 
-    public AbstractKademliaMessageHandler(Gson gson, DHTKademliaNodeAPI<ID, NettyConnectionInfo, K, V> dhtKademliaNodeAPI) {
+    public AbstractKademliaMessageHandler(Gson gson, DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI) {
         this.GSON = gson;
         this.dhtKademliaNodeAPI = dhtKademliaNodeAPI;
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
-        KademliaMessage<ID, NettyConnectionInfo, ? extends Serializable> responseMessage = null;
+        KademliaMessage<BigInteger, NettyConnectionInfo, ? extends Serializable> responseMessage = null;
 
         try {
             String m = this.parseJsonRequest(request);
-            KademliaMessage<ID, NettyConnectionInfo, Serializable> kademliaMessage = this.toKademliaMessage(m);
+            KademliaMessage<BigInteger, NettyConnectionInfo, Serializable> kademliaMessage = this.toKademliaMessage(m);
             responseMessage = this.dhtKademliaNodeAPI.onMessage(kademliaMessage);
             responseMessage.setNode(this.dhtKademliaNodeAPI);
         } catch (Exception e){
@@ -67,5 +67,5 @@ public abstract class AbstractKademliaMessageHandler<ID extends Number, K extend
         return jsonBuf.toString(CharsetUtil.UTF_8);
     }
 
-    protected abstract KademliaMessage<ID, NettyConnectionInfo, Serializable> toKademliaMessage(String message);
+    protected abstract KademliaMessage<BigInteger, NettyConnectionInfo, Serializable> toKademliaMessage(String message);
 }

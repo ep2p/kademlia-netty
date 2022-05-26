@@ -8,16 +8,17 @@ import io.ep2p.kademlia.node.Node;
 import lombok.Getter;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.concurrent.Future;
 
-public class NettyKadmliaDHTNode<ID extends Number, K extends Serializable, V extends Serializable>
-        extends DHTKademliaNodeAPIDecorator<ID, NettyConnectionInfo, K, V> {
+public class NettyKadmliaDHTNode<K extends Serializable, V extends Serializable>
+        extends DHTKademliaNodeAPIDecorator<BigInteger, NettyConnectionInfo, K, V> {
 
     @Getter
-    private final KademliaNodeServer<ID, K, V> kademliaNodeServer;
+    private final KademliaNodeServer<K, V> kademliaNodeServer;
 
-    public NettyKadmliaDHTNode(DHTKademliaNodeAPI<ID, NettyConnectionInfo, K, V> kademliaNode, KademliaNodeServer<ID, K, V> kademliaNodeServer) {
+    public NettyKadmliaDHTNode(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> kademliaNode, KademliaNodeServer<K, V> kademliaNodeServer) {
         super(kademliaNode);
         this.kademliaNodeServer = kademliaNodeServer;
     }
@@ -29,7 +30,7 @@ public class NettyKadmliaDHTNode<ID extends Number, K extends Serializable, V ex
     }
 
     @Override
-    public Future<Boolean> start(Node<ID, NettyConnectionInfo> bootstrapNode) {
+    public Future<Boolean> start(Node<BigInteger, NettyConnectionInfo> bootstrapNode) {
         kademliaNodeServer.run(this);
         return super.start(bootstrapNode);
     }

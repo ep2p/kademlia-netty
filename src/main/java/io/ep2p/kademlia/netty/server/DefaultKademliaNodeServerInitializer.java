@@ -14,27 +14,27 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import java.io.Serializable;
 import java.math.BigInteger;
 
-public class DefaultKademliaNodeServerInitializer<ID extends Number, K extends Serializable, V extends Serializable> extends ChannelInitializer<SocketChannel> implements KademliaNodeServerInitializer<ID, K, V> {
-    protected DHTKademliaNodeAPI<ID, NettyConnectionInfo, K, V> dhtKademliaNodeAPI;
-    private final KademliaMessageHandlerFactory<ID, K, V> kademliaMessageHandlerFactory;
+public class DefaultKademliaNodeServerInitializer<K extends Serializable, V extends Serializable> extends ChannelInitializer<SocketChannel> implements KademliaNodeServerInitializer<K, V> {
+    protected DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI;
+    private final KademliaMessageHandlerFactory<K, V> kademliaMessageHandlerFactory;
 
 
-    public DefaultKademliaNodeServerInitializer(KademliaMessageHandlerFactory<ID, K, V> kademliaMessageHandlerFactory) {
+    public DefaultKademliaNodeServerInitializer(KademliaMessageHandlerFactory<K, V> kademliaMessageHandlerFactory) {
         this.kademliaMessageHandlerFactory = kademliaMessageHandlerFactory;
     }
 
     public DefaultKademliaNodeServerInitializer() {
-        this.kademliaMessageHandlerFactory = new KademliaMessageHandlerFactory<ID, K, V>(){
+        this.kademliaMessageHandlerFactory = new KademliaMessageHandlerFactory<K, V>(){
 
             @Override
-            public SimpleChannelInboundHandler<FullHttpRequest> getKademliaMessageHandler(DHTKademliaNodeAPI<ID, NettyConnectionInfo, K, V> dhtKademliaNodeAPI) {
-                return new NettyKademliaMessageHandler<ID, K, V>(dhtKademliaNodeAPI);
+            public SimpleChannelInboundHandler<FullHttpRequest> getKademliaMessageHandler(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI) {
+                return new NettyKademliaMessageHandler<K, V>(dhtKademliaNodeAPI);
             }
         };
     }
 
     @Override
-    public void registerKademliaNode(DHTKademliaNodeAPI<ID, NettyConnectionInfo, K, V> dhtKademliaNodeAPI) {
+    public void registerKademliaNode(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI) {
         this.dhtKademliaNodeAPI = dhtKademliaNodeAPI;
     }
 
