@@ -2,9 +2,7 @@ package io.ep2p.kademlia.netty.server;
 
 import com.google.gson.Gson;
 import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
-import io.ep2p.kademlia.netty.factory.GsonFactory;
 import io.ep2p.kademlia.node.DHTKademliaNodeAPI;
-import io.ep2p.kademlia.protocol.message.EmptyKademliaMessage;
 import io.ep2p.kademlia.protocol.message.KademliaMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -16,9 +14,9 @@ import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.util.CharsetUtil;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_LENGTH;
@@ -26,6 +24,8 @@ import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
 import static io.netty.handler.codec.http.HttpHeaderValues.APPLICATION_JSON;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
+
+@Slf4j
 public abstract class AbstractKademliaMessageHandler<ID extends Number, K extends Serializable, V extends Serializable> extends SimpleChannelInboundHandler<FullHttpRequest> {
     private final DHTKademliaNodeAPI<ID, NettyConnectionInfo, K, V> dhtKademliaNodeAPI;
     protected final Gson GSON;
@@ -45,13 +45,16 @@ public abstract class AbstractKademliaMessageHandler<ID extends Number, K extend
             responseMessage = this.dhtKademliaNodeAPI.onMessage(kademliaMessage);
             responseMessage.setNode(this.dhtKademliaNodeAPI);
         } catch (Exception e){
-            //todo
+            log.error("Failed to handle request", e);
         }
 
         FullHttpResponse httpResponse = new DefaultFullHttpResponse(
                 request.protocolVersion(),
                 OK,
-                Unpooled.wrappedBuffer(this.GSON.toJson(responseMessage).getBytes(StandardCharsets.UTF_8))
+                Unpooled.wrappedBuffer(
+                        responseMessage != null ?
+                        this.GSON.toJson(responseMessage).getBytes(StandardCharsets.UTF_8): "".getBytes(StandardCharsets.UTF_8)
+                )
         );
 
         httpResponse.headers()

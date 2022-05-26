@@ -29,7 +29,7 @@ public class Example {
         NodeSettings.Default.PING_SCHEDULE_TIME_VALUE = 5;
         NodeSettings nodeSettings = NodeSettings.Default.build();
 
-        NettyMessageSender nettyMessageSender = new NettyMessageSender();
+        NettyMessageSender<BigInteger> nettyMessageSender = new NettyMessageSender<BigInteger>();
 
         RoutingTableFactory<BigInteger, NettyConnectionInfo, Bucket<BigInteger, NettyConnectionInfo>> routingTableFactory = new DefaultRoutingTableFactory<>(nodeSettings);
         KeyHashGenerator<BigInteger, String> keyHashGenerator = new KeyHashGenerator<BigInteger, String>() {

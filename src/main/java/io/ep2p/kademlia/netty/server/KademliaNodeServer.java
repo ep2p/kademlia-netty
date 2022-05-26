@@ -12,12 +12,14 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
 import java.math.BigInteger;
 
 
 @Getter
+@Slf4j
 public class KademliaNodeServer<ID extends Number, K extends Serializable, V extends Serializable> {
 
     private final int port;
@@ -69,8 +71,7 @@ public class KademliaNodeServer<ID extends Number, K extends Serializable, V ext
             this.bindFuture = bind.sync();
 
         } catch (InterruptedException e) {
-            //todo
-            e.printStackTrace();
+            log.error("Server interrupted", e);
             stop();
         }
 
