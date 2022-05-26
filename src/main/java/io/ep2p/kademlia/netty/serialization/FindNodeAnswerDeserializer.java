@@ -5,8 +5,8 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
-import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
 import io.ep2p.kademlia.model.FindNodeAnswer;
+import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
 import io.ep2p.kademlia.node.external.ExternalNode;
 
 import java.lang.reflect.Type;

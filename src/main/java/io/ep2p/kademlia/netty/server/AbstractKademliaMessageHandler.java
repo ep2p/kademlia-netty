@@ -2,9 +2,7 @@ package io.ep2p.kademlia.netty.server;
 
 import com.google.gson.Gson;
 import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
-import io.ep2p.kademlia.netty.factory.GsonFactory;
 import io.ep2p.kademlia.node.DHTKademliaNodeAPI;
-import io.ep2p.kademlia.protocol.message.EmptyKademliaMessage;
 import io.ep2p.kademlia.protocol.message.KademliaMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

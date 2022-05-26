@@ -2,9 +2,9 @@ package io.ep2p.kademlia.netty.serialization;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
+import io.ep2p.kademlia.model.FindNodeAnswer;
 import io.ep2p.kademlia.netty.common.NettyBigIntegerExternalNode;
 import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
-import io.ep2p.kademlia.model.FindNodeAnswer;
 import io.ep2p.kademlia.node.Node;
 import io.ep2p.kademlia.protocol.MessageType;
 import io.ep2p.kademlia.protocol.message.*;

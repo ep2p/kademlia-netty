@@ -1,7 +1,6 @@
 package io.ep2p.kademlia.netty.server;
 
 import com.google.gson.Gson;
-import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
 import io.ep2p.kademlia.netty.factory.GsonFactory;
