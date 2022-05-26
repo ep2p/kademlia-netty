@@ -1,14 +1,16 @@
 package io.ep2p.kademlia.netty;
 
 import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
+import io.ep2p.kademlia.netty.server.KademliaNodeServer;
 import io.ep2p.kademlia.node.DHTKademliaNodeAPI;
 import io.ep2p.kademlia.node.DHTKademliaNodeAPIDecorator;
+import io.ep2p.kademlia.node.Node;
 import lombok.Getter;
-import io.ep2p.kademlia.netty.server.KademliaNodeServer;
 
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.concurrent.Future;
 
 public class NettyKadmliaDHTNode<K extends Serializable, V extends Serializable>
         extends DHTKademliaNodeAPIDecorator<BigInteger, NettyConnectionInfo, K, V> {
@@ -23,24 +25,26 @@ public class NettyKadmliaDHTNode<K extends Serializable, V extends Serializable>
 
     @Override
     public void start() {
-        try {
-            kademliaNodeServer.run(this);
-            super.start();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        super.start();
+        kademliaNodeServer.run(this);
+    }
+
+    @Override
+    public Future<Boolean> start(Node<BigInteger, NettyConnectionInfo> bootstrapNode) {
+        kademliaNodeServer.run(this);
+        return super.start(bootstrapNode);
     }
 
     @Override
     public void stop(){
-        kademliaNodeServer.stop();
         super.stop();
+        kademliaNodeServer.stop();
     }
 
     @Override
     public void stopNow(){
-        kademliaNodeServer.stop();
         super.stopNow();
+        kademliaNodeServer.stop();
     }
 
     @Override

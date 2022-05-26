@@ -40,10 +40,11 @@ public abstract class AbstractKademliaMessageHandler<K extends Serializable, V e
         KademliaMessage<BigInteger, NettyConnectionInfo, ? extends Serializable> responseMessage = null;
 
         try {
-            KademliaMessage<BigInteger, NettyConnectionInfo, Serializable> kademliaMessage = this.toKademliaMessage(this.parseJsonRequest(request));
-             responseMessage = this.dhtKademliaNodeAPI.onMessage(kademliaMessage);
+            String m = this.parseJsonRequest(request);
+            KademliaMessage<BigInteger, NettyConnectionInfo, Serializable> kademliaMessage = this.toKademliaMessage(m);
+            responseMessage = this.dhtKademliaNodeAPI.onMessage(kademliaMessage);
+            responseMessage.setNode(this.dhtKademliaNodeAPI);
         } catch (Exception e){
-            responseMessage = new EmptyKademliaMessage<>();
             //todo
         }
 
@@ -57,7 +58,7 @@ public abstract class AbstractKademliaMessageHandler<K extends Serializable, V e
                 .set(CONTENT_TYPE, APPLICATION_JSON)
                 .setInt(CONTENT_LENGTH, httpResponse.content().readableBytes());
 
-        ChannelFuture f = ctx.write(httpResponse);
+        ChannelFuture f = ctx.writeAndFlush(httpResponse);
         f.addListener(ChannelFutureListener.CLOSE);
     }
 

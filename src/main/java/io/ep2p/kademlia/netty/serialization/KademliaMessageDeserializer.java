@@ -31,15 +31,17 @@ public class KademliaMessageDeserializer<K extends Serializable, V extends Seria
         this.registerDataType(MessageType.DHT_STORE_RESULT, new TypeToken<DHTStoreResultKademliaMessage.DHTStoreResult<K>>(){}.getType());
         this.registerMessageClass(MessageType.DHT_STORE_RESULT, DHTStoreResultKademliaMessage.class);
         this.registerDataType(MessageType.FIND_NODE_REQ, new TypeToken<BigInteger>(){}.getType());
-        this.registerMessageClass(MessageType.FIND_NODE_REQ, BigInteger.class);
+        this.registerMessageClass(MessageType.FIND_NODE_REQ, FindNodeRequestMessage.class);
         this.registerDataType(MessageType.FIND_NODE_RES, new TypeToken<FindNodeAnswer<BigInteger, NettyConnectionInfo>>(){}.getType());
-        this.registerMessageClass(MessageType.FIND_NODE_RES, FindNodeAnswer.class);
+        this.registerMessageClass(MessageType.FIND_NODE_RES, FindNodeResponseMessage.class);
         this.registerDataType(MessageType.PING, new TypeToken<String>(){}.getType());
-        this.registerMessageClass(MessageType.PING, String.class);
+        this.registerMessageClass(MessageType.PING, PingKademliaMessage.class);
         this.registerDataType(MessageType.PONG, new TypeToken<String>(){}.getType());
-        this.registerMessageClass(MessageType.PONG, String.class);
+        this.registerMessageClass(MessageType.PONG, PongKademliaMessage.class);
         this.registerDataType(MessageType.SHUTDOWN, new TypeToken<String>(){}.getType());
-        this.registerMessageClass(MessageType.SHUTDOWN, String.class);
+        this.registerMessageClass(MessageType.SHUTDOWN, ShutdownKademliaMessage.class);
+        this.registerDataType(MessageType.EMPTY, new TypeToken<String>(){}.getType());
+        this.registerMessageClass(MessageType.EMPTY, EmptyKademliaMessage.class);
     }
 
     @SneakyThrows
@@ -52,7 +54,6 @@ public class KademliaMessageDeserializer<K extends Serializable, V extends Seria
                 jsonObject.getAsJsonObject("node"),
                 NettyBigIntegerExternalNode.class
         );
-
         Class<?> aClass = this.messageClassRegistry.get(type_);
         KademliaMessage<BigInteger, NettyConnectionInfo, Serializable> o = (KademliaMessage<BigInteger, NettyConnectionInfo, Serializable>) aClass.newInstance();
         o.setData(getData(type_, jsonObject, jsonDeserializationContext));
@@ -72,7 +73,7 @@ public class KademliaMessageDeserializer<K extends Serializable, V extends Seria
         Type dataType = typeRegistry.get(type);
         if (dataType != null){
             return jsonDeserializationContext.deserialize(
-                    jsonObject.getAsJsonObject("data"),
+                    jsonObject.get("data"),
                     dataType
             );
         }

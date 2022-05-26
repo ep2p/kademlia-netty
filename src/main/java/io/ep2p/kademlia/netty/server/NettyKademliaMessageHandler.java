@@ -10,7 +10,6 @@ import java.io.Serializable;
 import java.math.BigInteger;
 
 public class NettyKademliaMessageHandler<K extends Serializable, V extends Serializable> extends AbstractKademliaMessageHandler<K, V> {
-    private final GsonFactory gsonFactory;
 
     public NettyKademliaMessageHandler(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI) {
         this(dhtKademliaNodeAPI, new GsonFactory.DefaultGsonFactory());
@@ -18,14 +17,13 @@ public class NettyKademliaMessageHandler<K extends Serializable, V extends Seria
 
     public NettyKademliaMessageHandler(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI, GsonFactory gsonFactory) {
         super(gsonFactory, dhtKademliaNodeAPI);
-        this.gsonFactory = gsonFactory;
     }
 
     @Override
     protected KademliaMessage<BigInteger, NettyConnectionInfo, Serializable> toKademliaMessage(String message) {
-        return gsonFactory.gson().fromJson(
+        return this.GSON.fromJson(
                 message,
-                new TypeToken<KademliaMessage<BigInteger, NettyConnectionInfo, Serializable>>() {}.getType()
+                new TypeToken<KademliaMessage<BigInteger, NettyConnectionInfo, Serializable>>(){}.getType()
         );
     }
 }

@@ -48,6 +48,6 @@ public class DefaultKademliaNodeServerInitializer<K extends Serializable, V exte
     public void pipelineInitializer(ChannelPipeline pipeline) {
         pipeline.addLast(new HttpServerCodec());
         pipeline.addLast(new HttpObjectAggregator(Integer.MAX_VALUE));
-        pipeline.addLast("handler", this.kademliaMessageHandlerFactory.getKademliaMessageHandler(this.dhtKademliaNodeAPI));
+        pipeline.addLast(this.kademliaMessageHandlerFactory.getKademliaMessageHandler(this.dhtKademliaNodeAPI));
     }
 }

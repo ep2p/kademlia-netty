@@ -9,6 +9,8 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -21,9 +23,11 @@ public class KademliaNodeServer<K extends Serializable, V extends Serializable> 
     private final int port;
     private final String host;
     private final KademliaNodeServerInitializerAPIFactory kademliaNodeServerInitializerAPIFactory;
+    private boolean running = false;
 
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
+    private ChannelFuture bindFuture;
 
     public KademliaNodeServer(String host, int port, KademliaNodeServerInitializerAPIFactory kademliaNodeServerInitializerAPIFactory) {
         this.port = port;
@@ -43,32 +47,59 @@ public class KademliaNodeServer<K extends Serializable, V extends Serializable> 
         this(host, port, new KademliaNodeServerInitializerAPIFactory());
     }
 
-    public synchronized void run(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI) throws InterruptedException {
+    public synchronized void run(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI) {
+        assert !running;
+
         this.bossGroup = new NioEventLoopGroup();
         this.workerGroup = new NioEventLoopGroup();
 
         KademliaNodeServerInitializer<K, V> kademliaNodeServerInitializer = kademliaNodeServerInitializerAPIFactory.getKademliaNodeServerInitializerAPI();
         kademliaNodeServerInitializer.registerKademliaNode(dhtKademliaNodeAPI);
+
         try {
             ServerBootstrap bootstrap = new ServerBootstrap()
                     .group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
-                    .handler(kademliaNodeServerInitializer)
-                    .option(ChannelOption.SO_BACKLOG, 128);
+                    .handler(new LoggingHandler(LogLevel.INFO))
+                    .childHandler(kademliaNodeServerInitializer)
+                    .option(ChannelOption.SO_BACKLOG, 128)
+                    .option(ChannelOption.SO_KEEPALIVE, false);
 
             ChannelFuture bind = host != null ? bootstrap.bind(host, port) : bootstrap.bind(port);
-            bind.sync().channel().closeFuture().sync();
-        } finally {
-            bossGroup.shutdownGracefully();
-            workerGroup.shutdownGracefully();
+            this.bindFuture = bind.sync();
+
+        } catch (InterruptedException e) {
+            //todo
+            e.printStackTrace();
+            stop();
         }
+
+        running = true;
     }
 
     public synchronized void stop(){
         if (bossGroup != null && workerGroup != null){
-            bossGroup.shutdownGracefully();
-            workerGroup.shutdownGracefully();
+            try {
+                bossGroup.shutdownGracefully().sync();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            try {
+                workerGroup.shutdownGracefully().sync();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+        try {
+            this.bindFuture.channel().closeFuture().sync();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+
+        this.running = false;
+
     }
 
 }
