@@ -136,4 +136,17 @@ node1.stopNow()
 
 ---
 
+## Installation
+
+Using maven:
+
+```xml
+<dependency>
+    <groupId>io.ep2p</groupId>
+    <artifactId>kademlia-netty</artifactId>
+    <version>0.1.0-RELEASE</version>
+</dependency>
+```
+
+
 Cheers
