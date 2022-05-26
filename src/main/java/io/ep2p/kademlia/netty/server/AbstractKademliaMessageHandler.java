@@ -30,8 +30,8 @@ public abstract class AbstractKademliaMessageHandler<ID extends Number, K extend
     private final DHTKademliaNodeAPI<ID, NettyConnectionInfo, K, V> dhtKademliaNodeAPI;
     protected final Gson GSON;
 
-    public AbstractKademliaMessageHandler(GsonFactory gsonFactory, DHTKademliaNodeAPI<ID, NettyConnectionInfo, K, V> dhtKademliaNodeAPI) {
-        this.GSON = gsonFactory.gson();
+    public AbstractKademliaMessageHandler(Gson gson, DHTKademliaNodeAPI<ID, NettyConnectionInfo, K, V> dhtKademliaNodeAPI) {
+        this.GSON = gson;
         this.dhtKademliaNodeAPI = dhtKademliaNodeAPI;
     }
 

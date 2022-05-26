@@ -1,5 +1,6 @@
 package io.ep2p.kademlia.netty.server;
 
+import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
 import io.ep2p.kademlia.netty.factory.GsonFactory;
@@ -12,11 +13,11 @@ import java.math.BigInteger;
 public class NettyKademliaMessageHandler<ID extends Number, K extends Serializable, V extends Serializable> extends AbstractKademliaMessageHandler<ID, K, V> {
 
     public NettyKademliaMessageHandler(DHTKademliaNodeAPI<ID, NettyConnectionInfo, K, V> dhtKademliaNodeAPI) {
-        this(dhtKademliaNodeAPI, new GsonFactory.DefaultGsonFactory());
+        this(new GsonFactory.DefaultGsonFactory().gson(), dhtKademliaNodeAPI);
     }
 
-    public NettyKademliaMessageHandler(DHTKademliaNodeAPI<ID, NettyConnectionInfo, K, V> dhtKademliaNodeAPI, GsonFactory gsonFactory) {
-        super(gsonFactory, dhtKademliaNodeAPI);
+    public NettyKademliaMessageHandler(Gson gson, DHTKademliaNodeAPI<ID, NettyConnectionInfo, K, V> dhtKademliaNodeAPI) {
+        super(gson, dhtKademliaNodeAPI);
     }
 
     @Override
