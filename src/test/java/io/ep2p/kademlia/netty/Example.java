@@ -15,6 +15,7 @@ import io.ep2p.kademlia.table.RoutingTableFactory;
 import io.ep2p.kademlia.util.BoundedHashUtil;
 import lombok.SneakyThrows;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -40,36 +41,25 @@ public class Example {
         };
 
 
-        // node 1
-        NettyConnectionInfo nettyConnectionInfo = new NettyConnectionInfo("localhost", 8000);
-        BigInteger id1 = BigInteger.valueOf(1);
-        SampleRepository node1Repository = new SampleRepository();
-        DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, String, String> kademliaNode = new DHTKademliaNode(
-                id1,
-                nettyConnectionInfo,
-                routingTableFactory.getRoutingTable(id1),
-                nettyMessageSender,
-                nodeSettings, node1Repository, keyHashGenerator
-        );
-        KademliaNodeServer<BigInteger, String, String> kademliaNodeServer = new KademliaNodeServer<>("localhost", 8000);
-        NettyKadmliaDHTNode<BigInteger, String, String> node1 = new NettyKadmliaDHTNode<>(kademliaNode, kademliaNodeServer);
+        NettyKadmliaDHTNode<BigInteger, String, String> node1 = new NettyKademliaDHTNodeBuilder<BigInteger, String, String>()
+                .id(BigInteger.valueOf(1))
+                .connectionInfo(new NettyConnectionInfo("127.0.0.1", 8000))
+                .nodeSettings(nodeSettings)
+                .keyHashGenerator(keyHashGenerator)
+                .repository(new SampleRepository())
+                .build();
         node1.start();
 
         Thread.sleep(2000);
-
         // node 2
-        NettyConnectionInfo nettyConnectionInfo2 = new NettyConnectionInfo("localhost", 8001);
-        BigInteger id2 = BigInteger.valueOf(2);
-        SampleRepository node2Repository = new SampleRepository();
-        DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, String, String> kademliaNode2 = new DHTKademliaNode(
-                id2,
-                nettyConnectionInfo2,
-                routingTableFactory.getRoutingTable(id2),
-                nettyMessageSender,
-                nodeSettings, node2Repository, keyHashGenerator
-        );
-        KademliaNodeServer<BigInteger, String, String> kademliaNodeServer2 = new KademliaNodeServer<>("localhost", 8001);
-        NettyKadmliaDHTNode<BigInteger, String, String> node2 = new NettyKadmliaDHTNode<>(kademliaNode2, kademliaNodeServer2);
+        NettyKadmliaDHTNode<BigInteger, String, String> node2 = new NettyKademliaDHTNodeBuilder<BigInteger, String, String>()
+                .id(BigInteger.valueOf(2))
+                .connectionInfo(new NettyConnectionInfo("127.0.0.1", 8001))
+                .nodeSettings(nodeSettings)
+                .keyHashGenerator(keyHashGenerator)
+                .repository(new SampleRepository())
+                .build();
+
         System.out.println("Bootstrapped? " + node2.start(node1).get(5, TimeUnit.SECONDS));
 
         StoreAnswer<BigInteger, String> storeAnswer = node2.store("K", "V").get();
