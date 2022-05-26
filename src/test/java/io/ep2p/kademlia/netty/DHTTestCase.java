@@ -52,36 +52,26 @@ public class DHTTestCase {
         nettyMessageSender2 = new NettyMessageSender();
 
         // node 1
-        NettyConnectionInfo nettyConnectionInfo = new NettyConnectionInfo("localhost", 8000);
-        BigInteger id1 = BigInteger.valueOf(1);
-        SampleRepository node1Repository = new SampleRepository();
-        DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, String, String> kademliaNode = new DHTKademliaNode(
-                id1,
-                nettyConnectionInfo,
-                routingTableFactory.getRoutingTable(id1),
-                nettyMessageSender1,
-                nodeSettings, node1Repository, keyHashGenerator
-        );
-        KademliaNodeServer<String, String> kademliaNodeServer = new KademliaNodeServer<>("localhost", 8000);
-        node1 = new NettyKadmliaDHTNode<>(kademliaNode, kademliaNodeServer);
+        node1 = new NettyKademliaDHTNodeBuilder<String, String>()
+                .id(BigInteger.valueOf(1))
+                .connectionInfo(new NettyConnectionInfo("127.0.0.1", 8000))
+                .nodeSettings(nodeSettings)
+                .keyHashGenerator(keyHashGenerator)
+                .repository(new SampleRepository())
+                .build();
         node1.start();
 
 
         Thread.sleep(1000);
 
         // node 2
-        NettyConnectionInfo nettyConnectionInfo2 = new NettyConnectionInfo("localhost", 8001);
-        BigInteger id2 = BigInteger.valueOf(2);
-        SampleRepository node2Repository = new SampleRepository();
-        DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, String, String> kademliaNode2 = new DHTKademliaNode(
-                id2,
-                nettyConnectionInfo2,
-                routingTableFactory.getRoutingTable(id2),
-                nettyMessageSender2,
-                nodeSettings, node2Repository, keyHashGenerator
-        );
-        KademliaNodeServer<String, String> kademliaNodeServer2 = new KademliaNodeServer<>("localhost", 8001);
-        node2 = new NettyKadmliaDHTNode<>(kademliaNode2, kademliaNodeServer2);
+        node2 = new NettyKademliaDHTNodeBuilder<String, String>()
+                .id(BigInteger.valueOf(2))
+                .connectionInfo(new NettyConnectionInfo("127.0.0.1", 8001))
+                .nodeSettings(nodeSettings)
+                .keyHashGenerator(keyHashGenerator)
+                .repository(new SampleRepository())
+                .build();
         System.out.println("Bootstrapped? " + node2.start(node1).get(5, TimeUnit.SECONDS));
 
         Thread.sleep(1000);

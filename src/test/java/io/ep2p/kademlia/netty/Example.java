@@ -40,7 +40,7 @@ public class Example {
         };
 
 
-        NettyKadmliaDHTNode<BigInteger, String, String> node1 = new NettyKademliaDHTNodeBuilder<BigInteger, String, String>()
+        NettyKadmliaDHTNode<String, String> node1 = new NettyKademliaDHTNodeBuilder<String, String>()
                 .id(BigInteger.valueOf(1))
                 .connectionInfo(new NettyConnectionInfo("127.0.0.1", 8000))
                 .nodeSettings(nodeSettings)
@@ -52,7 +52,7 @@ public class Example {
         Thread.sleep(2000);
 
         // node 2
-        NettyKadmliaDHTNode<BigInteger, String, String> node2 = new NettyKademliaDHTNodeBuilder<BigInteger, String, String>()
+        NettyKadmliaDHTNode< String, String> node2 = new NettyKademliaDHTNodeBuilder<String, String>()
                 .id(BigInteger.valueOf(2))
                 .connectionInfo(new NettyConnectionInfo("127.0.0.1", 8001))
                 .nodeSettings(nodeSettings)
