@@ -1,3 +1,8 @@
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.ep2p/kademlia-netty/badge.png?gav=true)](https://maven-badges.herokuapp.com/maven-central/io.ep2p/kademlia-netty)
+[![Github Releases](https://badgen.net/github/release/ep2p/kademlia-netty)](https://github.com/ep2p/kademlia-netty/releases)
+[![Open Issues](https://badgen.net/github/open-issues/ep2p/kademlia-netty)](https://github.com/ep2p/kademlia-netty/issues)
+[![Liscence](https://badgen.net/github/license/ep2p/kademlia-netty)](https://github.com/ep2p/kademlia-netty/blob/main/LICENSE)
+
 # kademlia netty
 
 **This Project is still under development** 
