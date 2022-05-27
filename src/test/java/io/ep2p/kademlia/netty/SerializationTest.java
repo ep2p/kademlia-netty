@@ -21,7 +21,8 @@ import java.math.BigInteger;
 import java.util.Date;
 
 
-public class SerializationTestCase {
+
+public class SerializationTest {
     private static Gson gson = null;
     private static Node<BigInteger, NettyConnectionInfo> node = null;
 

@@ -8,9 +8,6 @@ import io.ep2p.kademlia.model.StoreAnswer;
 import io.ep2p.kademlia.netty.client.NettyMessageSender;
 import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
 import io.ep2p.kademlia.node.KeyHashGenerator;
-import io.ep2p.kademlia.table.Bucket;
-import io.ep2p.kademlia.table.DefaultRoutingTableFactory;
-import io.ep2p.kademlia.table.RoutingTableFactory;
 import io.ep2p.kademlia.util.BoundedHashUtil;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterAll;
@@ -22,12 +19,10 @@ import java.math.BigInteger;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-public class DHTTestCase {
-    private static KeyHashGenerator<BigInteger, String> keyHashGenerator;
-    private static RoutingTableFactory<BigInteger, NettyConnectionInfo, Bucket<BigInteger, NettyConnectionInfo>> routingTableFactory;
+public class DHTTest {
 
-    private static NettyMessageSender nettyMessageSender1;
-    private static NettyMessageSender nettyMessageSender2;
+    private static NettyMessageSender<String, String> nettyMessageSender1;
+    private static NettyMessageSender<String, String> nettyMessageSender2;
     private static NettyKadmliaDHTNode<String, String> node1;
     private static NettyKadmliaDHTNode<String, String> node2;
 
@@ -40,21 +35,20 @@ public class DHTTestCase {
         NodeSettings.Default.PING_SCHEDULE_TIME_VALUE = 5;
         NodeSettings nodeSettings = NodeSettings.Default.build();
 
-        routingTableFactory = new DefaultRoutingTableFactory<>(nodeSettings);
-        keyHashGenerator = new KeyHashGenerator<BigInteger, String>() {
+        KeyHashGenerator<BigInteger, String> keyHashGenerator = new KeyHashGenerator<BigInteger, String>() {
             @Override
             public BigInteger generateHash(String key) {
                 return new BoundedHashUtil(NodeSettings.Default.IDENTIFIER_SIZE).hash(key.hashCode(), BigInteger.class);
             }
         };
 
-        nettyMessageSender1 = new NettyMessageSender();
-        nettyMessageSender2 = new NettyMessageSender();
+        nettyMessageSender1 = new NettyMessageSender<>();
+        nettyMessageSender2 = new NettyMessageSender<>();
 
         // node 1
         node1 = new NettyKademliaDHTNodeBuilder<String, String>()
                 .id(BigInteger.valueOf(1))
-                .connectionInfo(new NettyConnectionInfo("127.0.0.1", 8000))
+                .connectionInfo(new NettyConnectionInfo("127.0.0.1", NodeHelper.findRandomPort()))
                 .nodeSettings(nodeSettings)
                 .keyHashGenerator(keyHashGenerator)
                 .repository(new SampleRepository())
@@ -67,7 +61,7 @@ public class DHTTestCase {
         // node 2
         node2 = new NettyKademliaDHTNodeBuilder<String, String>()
                 .id(BigInteger.valueOf(2))
-                .connectionInfo(new NettyConnectionInfo("127.0.0.1", 8001))
+                .connectionInfo(new NettyConnectionInfo("127.0.0.1", NodeHelper.findRandomPort()))
                 .nodeSettings(nodeSettings)
                 .keyHashGenerator(keyHashGenerator)
                 .repository(new SampleRepository())
