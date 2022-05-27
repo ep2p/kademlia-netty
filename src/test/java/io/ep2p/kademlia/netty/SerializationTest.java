@@ -21,13 +21,14 @@ import java.math.BigInteger;
 import java.util.Date;
 
 
-public class SerializationTestCase {
+
+public class SerializationTest {
     private static Gson gson = null;
     private static Node<BigInteger, NettyConnectionInfo> node = null;
 
     @BeforeAll
     public static void initGson(){
-        gson = new GsonFactory.DefaultGsonFactory().gson();
+        gson = new GsonFactory.DefaultGsonFactory<String, String>().gson();
         node = NettyBigIntegerExternalNode.builder()
                 .id(BigInteger.valueOf(1))
                 .connectionInfo(new NettyConnectionInfo("localhost", 8000))

@@ -10,28 +10,30 @@ import io.ep2p.kademlia.node.Node;
 import io.ep2p.kademlia.node.external.ExternalNode;
 import io.ep2p.kademlia.protocol.message.*;
 
+import java.io.Serializable;
+
 public interface GsonFactory {
     Gson gson();
 
-    class DefaultGsonFactory implements GsonFactory {
+    class DefaultGsonFactory<K extends Serializable, V extends Serializable> implements GsonFactory {
 
         @Override
         public Gson gson() {
             GsonBuilder gsonBuilder = new GsonBuilder();
-            gsonBuilder
-                    .enableComplexMapKeySerialization()
-                    .serializeNulls();
-            gsonBuilder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
-            gsonBuilder.registerTypeAdapter(KademliaMessage.class, new KademliaMessageDeserializer<String, String>());
-            gsonBuilder.registerTypeAdapter(DHTLookupKademliaMessage.DHTLookup.class, new DHTLookUpDeserializer<String>());
-            gsonBuilder.registerTypeAdapter(DHTLookupResultKademliaMessage.DHTLookupResult.class, new DHTLookUpResultDeserializer<String, String>());
-            gsonBuilder.registerTypeAdapter(DHTStoreKademliaMessage.DHTData.class, new DHTStoreDeserializer<String, String>());
-            gsonBuilder.registerTypeAdapter(DHTStoreResultKademliaMessage.DHTStoreResult.class, new DHTStoreResultDeserializer<String>());
-            gsonBuilder.registerTypeAdapter(ExternalNode.class, new ExternalNodeDeserializer());
-            gsonBuilder.registerTypeAdapter(FindNodeAnswer.class, new FindNodeAnswerDeserializer());
-            gsonBuilder.registerTypeAdapter(NettyBigIntegerExternalNode.class, new NodeDeserializer());
-            gsonBuilder.registerTypeAdapter(Node.class, new NodeSerializer());
-            return gsonBuilder.create();
+            return gsonBuilder
+                .enableComplexMapKeySerialization()
+                .serializeNulls()
+                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                .registerTypeAdapter(KademliaMessage.class, new KademliaMessageDeserializer<K, V>())
+                .registerTypeAdapter(DHTLookupKademliaMessage.DHTLookup.class, new DHTLookUpDeserializer<K>())
+                .registerTypeAdapter(DHTLookupResultKademliaMessage.DHTLookupResult.class, new DHTLookUpResultDeserializer<K, V>())
+                .registerTypeAdapter(DHTStoreKademliaMessage.DHTData.class, new DHTStoreDeserializer<K, V>())
+                .registerTypeAdapter(DHTStoreResultKademliaMessage.DHTStoreResult.class, new DHTStoreResultDeserializer<K>())
+                .registerTypeAdapter(ExternalNode.class, new ExternalNodeDeserializer())
+                .registerTypeAdapter(FindNodeAnswer.class, new FindNodeAnswerDeserializer())
+                .registerTypeAdapter(NettyBigIntegerExternalNode.class, new NodeDeserializer())
+                .registerTypeAdapter(Node.class, new NodeSerializer())
+                .create();
         }
     }
 
