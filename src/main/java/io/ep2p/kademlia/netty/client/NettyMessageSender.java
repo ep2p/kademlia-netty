@@ -20,7 +20,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class NettyMessageSender implements MessageSender<BigInteger, NettyConnectionInfo> {
+public class NettyMessageSender<K extends Serializable, V extends Serializable> implements MessageSender<BigInteger, NettyConnectionInfo> {
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
     private final Gson gson;
     private final OkHttpClient client;
@@ -41,11 +41,11 @@ public class NettyMessageSender implements MessageSender<BigInteger, NettyConnec
     }
 
     public NettyMessageSender(ExecutorService executorService){
-        this(new GsonFactory.DefaultGsonFactory().gson(), executorService);
+        this(new GsonFactory.DefaultGsonFactory<K, V>().gson(), executorService);
     }
 
     public NettyMessageSender() {
-        this(new GsonFactory.DefaultGsonFactory().gson());
+        this(new GsonFactory.DefaultGsonFactory<K, V>().gson());
     }
 
     @Override
