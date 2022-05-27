@@ -13,7 +13,7 @@ import java.math.BigInteger;
 public class NettyKademliaMessageHandler<K extends Serializable, V extends Serializable> extends AbstractKademliaMessageHandler<K, V> {
 
     public NettyKademliaMessageHandler(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI) {
-        this(new GsonFactory.DefaultGsonFactory().gson(), dhtKademliaNodeAPI);
+        this(new GsonFactory.DefaultGsonFactory<K, V>().gson(), dhtKademliaNodeAPI);
     }
 
     public NettyKademliaMessageHandler(Gson gson, DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI) {
