@@ -71,7 +71,7 @@ public class NettyKademliaDHTNodeBuilder<K extends Serializable, V extends Seria
         return this;
     }
 
-    public NettyKadmliaDHTNode<K, V> build(){
+    public NettyKademliaDHTNode<K, V> build(){
         if (!requiredFulfilled()){
             throw new IllegalStateException("Can not build until required parameters are set");
         }
@@ -86,7 +86,7 @@ public class NettyKademliaDHTNodeBuilder<K extends Serializable, V extends Seria
                 this.nodeSettings, this.repository, this.keyHashGenerator
         );
 
-        return new NettyKadmliaDHTNode<>(kademliaNode, this.kademliaNodeServer);
+        return new NettyKademliaDHTNode<>(kademliaNode, this.kademliaNodeServer);
     }
 
     protected void fillDefaults() {
