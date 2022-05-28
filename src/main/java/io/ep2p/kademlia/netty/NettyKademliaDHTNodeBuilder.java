@@ -19,9 +19,12 @@ import io.ep2p.kademlia.table.DefaultRoutingTableFactory;
 import io.ep2p.kademlia.table.RoutingTable;
 import io.ep2p.kademlia.table.RoutingTableFactory;
 import lombok.Getter;
+import lombok.SneakyThrows;
 
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Getter
@@ -38,6 +41,14 @@ public class NettyKademliaDHTNodeBuilder<K extends Serializable, V extends Seria
     private KademliaMessageHandlerFactory<K, V> kademliaMessageHandlerFactory;
     private NettyServerInitializerFactory<K, V> nettyServerInitializerFactory;
 
+    protected List<String> required = new ArrayList<>();
+
+    public NettyKademliaDHTNodeBuilder() {
+        this.required.add("id");
+        this.required.add("connectionInfo");
+        this.required.add("repository");
+        this.required.add("keyHashGenerator");
+    }
 
     public NettyKademliaDHTNodeBuilder<K, V> id(BigInteger id){
         this.id = id;
@@ -174,8 +185,14 @@ public class NettyKademliaDHTNodeBuilder<K extends Serializable, V extends Seria
     }
 
 
-    private boolean requiredFulfilled() {
-        return this.id != null && this.connectionInfo != null && this.repository != null && this.keyHashGenerator != null;
+    @SneakyThrows
+    protected boolean requiredFulfilled() {
+        for (String f : this.required) {
+            if (this.getClass().getDeclaredField(f).get(this) == null) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }
