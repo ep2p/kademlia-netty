@@ -4,7 +4,12 @@ import io.ep2p.kademlia.NodeSettings;
 import io.ep2p.kademlia.connection.MessageSender;
 import io.ep2p.kademlia.netty.client.NettyMessageSender;
 import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
+import io.ep2p.kademlia.netty.factory.GsonFactory;
+import io.ep2p.kademlia.netty.factory.KademliaMessageHandlerFactory;
+import io.ep2p.kademlia.netty.factory.NettyServerInitializerFactory;
 import io.ep2p.kademlia.netty.server.KademliaNodeServer;
+import io.ep2p.kademlia.netty.server.filter.KademliaMainHandlerFilter;
+import io.ep2p.kademlia.netty.server.filter.NettyKademliaServerFilterChain;
 import io.ep2p.kademlia.node.DHTKademliaNode;
 import io.ep2p.kademlia.node.DHTKademliaNodeAPI;
 import io.ep2p.kademlia.node.KeyHashGenerator;
@@ -13,23 +18,26 @@ import io.ep2p.kademlia.table.Bucket;
 import io.ep2p.kademlia.table.DefaultRoutingTableFactory;
 import io.ep2p.kademlia.table.RoutingTable;
 import io.ep2p.kademlia.table.RoutingTableFactory;
+import lombok.Getter;
 
 import java.io.Serializable;
 import java.math.BigInteger;
 
+
+@Getter
 public class NettyKademliaDHTNodeBuilder<K extends Serializable, V extends Serializable> {
     private BigInteger id;
     private NettyConnectionInfo connectionInfo;
     private RoutingTable<BigInteger, NettyConnectionInfo, Bucket<BigInteger, NettyConnectionInfo>> routingTable;
     private MessageSender<BigInteger, NettyConnectionInfo> messageSender;
     private NodeSettings nodeSettings;
+    private GsonFactory gsonFactory;
     private KademliaRepository<K, V> repository;
     private KeyHashGenerator<BigInteger, K> keyHashGenerator;
     private KademliaNodeServer<K, V> kademliaNodeServer;
+    private KademliaMessageHandlerFactory<K, V> kademliaMessageHandlerFactory;
+    private NettyServerInitializerFactory<K, V> nettyServerInitializerFactory;
 
-
-    public NettyKademliaDHTNodeBuilder() {
-    }
 
     public NettyKademliaDHTNodeBuilder<K, V> id(BigInteger id){
         this.id = id;
@@ -71,6 +79,21 @@ public class NettyKademliaDHTNodeBuilder<K extends Serializable, V extends Seria
         return this;
     }
 
+    public NettyKademliaDHTNodeBuilder<K, V> kademliaMessageHandlerFactory(KademliaMessageHandlerFactory<K, V> kademliaMessageHandlerFactory){
+        this.kademliaMessageHandlerFactory = kademliaMessageHandlerFactory;
+        return this;
+    }
+
+    public NettyKademliaDHTNodeBuilder<K, V> nettyServerInitializerFactory(NettyServerInitializerFactory<K, V> nettyServerInitializerFactory){
+        this.nettyServerInitializerFactory = nettyServerInitializerFactory;
+        return this;
+    }
+
+    public NettyKademliaDHTNodeBuilder<K, V> gsonFactory(GsonFactory gsonFactory){
+        this.gsonFactory = gsonFactory;
+        return this;
+    }
+
     public NettyKademliaDHTNode<K, V> build(){
         if (!requiredFulfilled()){
             throw new IllegalStateException("Can not build until required parameters are set");
@@ -98,8 +121,20 @@ public class NettyKademliaDHTNodeBuilder<K extends Serializable, V extends Seria
             this.setMessageSenderDefault();
         }
 
+        if (this.gsonFactory == null){
+            this.gsonFactoryDefault();
+        }
+
+        if (this.kademliaMessageHandlerFactory == null){
+            this.setKademliaMessageHandlerFactoryDefault();
+        }
+
+        if (this.nettyServerInitializerFactory == null){
+            this.setNettyServerInitializerFactoryDefault();
+        }
+
         if (this.kademliaNodeServer == null){
-            this.setKademliaNodeServer();
+            this.setKademliaNodeServerDefault();
         }
 
         if (this.nodeSettings == null){
@@ -107,12 +142,26 @@ public class NettyKademliaDHTNodeBuilder<K extends Serializable, V extends Seria
         }
     }
 
+    private void setKademliaMessageHandlerFactoryDefault(){
+        NettyKademliaServerFilterChain<K, V> filterChain = new NettyKademliaServerFilterChain<>();
+        filterChain.addFilter(new KademliaMainHandlerFilter<>(gsonFactory.gson()));
+        this.kademliaMessageHandlerFactory = new KademliaMessageHandlerFactory.DefaultKademliaMessageHandlerFactory<>(filterChain);
+    }
+
+    private void gsonFactoryDefault() {
+        this.gsonFactory = new GsonFactory.DefaultGsonFactory<>();
+    }
+
+    private void setNettyServerInitializerFactoryDefault() {
+        this.nettyServerInitializerFactory = new NettyServerInitializerFactory.DefaultNettyServerInitializerFactory<>(this.kademliaMessageHandlerFactory);
+    }
+
     private void setNodeSettingsDefault() {
         this.nodeSettings = NodeSettings.Default.build();
     }
 
-    protected void setKademliaNodeServer() {
-        this.kademliaNodeServer = new KademliaNodeServer<>(this.connectionInfo.getHost(), this.connectionInfo.getPort());
+    protected void setKademliaNodeServerDefault() {
+        this.kademliaNodeServer = new KademliaNodeServer<>(this.connectionInfo.getHost(), this.connectionInfo.getPort(), this.nettyServerInitializerFactory);
     }
 
     protected void setRoutingTableDefault(){
@@ -121,7 +170,7 @@ public class NettyKademliaDHTNodeBuilder<K extends Serializable, V extends Seria
     }
 
     protected void setMessageSenderDefault(){
-        this.messageSender = new NettyMessageSender();
+        this.messageSender = new NettyMessageSender<K, V>();
     }
 
 

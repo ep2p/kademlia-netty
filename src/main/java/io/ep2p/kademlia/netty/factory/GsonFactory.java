@@ -17,23 +17,26 @@ public interface GsonFactory {
 
     class DefaultGsonFactory<K extends Serializable, V extends Serializable> implements GsonFactory {
 
-        @Override
-        public Gson gson() {
+        public GsonBuilder gsonBuilder(){
             GsonBuilder gsonBuilder = new GsonBuilder();
             return gsonBuilder
-                .enableComplexMapKeySerialization()
-                .serializeNulls()
-                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                .registerTypeAdapter(KademliaMessage.class, new KademliaMessageDeserializer<K, V>())
-                .registerTypeAdapter(DHTLookupKademliaMessage.DHTLookup.class, new DHTLookUpDeserializer<K>())
-                .registerTypeAdapter(DHTLookupResultKademliaMessage.DHTLookupResult.class, new DHTLookUpResultDeserializer<K, V>())
-                .registerTypeAdapter(DHTStoreKademliaMessage.DHTData.class, new DHTStoreDeserializer<K, V>())
-                .registerTypeAdapter(DHTStoreResultKademliaMessage.DHTStoreResult.class, new DHTStoreResultDeserializer<K>())
-                .registerTypeAdapter(ExternalNode.class, new ExternalNodeDeserializer())
-                .registerTypeAdapter(FindNodeAnswer.class, new FindNodeAnswerDeserializer())
-                .registerTypeAdapter(NettyBigIntegerExternalNode.class, new NodeDeserializer())
-                .registerTypeAdapter(Node.class, new NodeSerializer())
-                .create();
+                    .enableComplexMapKeySerialization()
+                    .serializeNulls()
+                    .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                    .registerTypeAdapter(KademliaMessage.class, new KademliaMessageDeserializer<K, V>())
+                    .registerTypeAdapter(DHTLookupKademliaMessage.DHTLookup.class, new DHTLookUpDeserializer<K>())
+                    .registerTypeAdapter(DHTLookupResultKademliaMessage.DHTLookupResult.class, new DHTLookUpResultDeserializer<K, V>())
+                    .registerTypeAdapter(DHTStoreKademliaMessage.DHTData.class, new DHTStoreDeserializer<K, V>())
+                    .registerTypeAdapter(DHTStoreResultKademliaMessage.DHTStoreResult.class, new DHTStoreResultDeserializer<K>())
+                    .registerTypeAdapter(ExternalNode.class, new ExternalNodeDeserializer())
+                    .registerTypeAdapter(FindNodeAnswer.class, new FindNodeAnswerDeserializer())
+                    .registerTypeAdapter(NettyBigIntegerExternalNode.class, new NodeDeserializer())
+                    .registerTypeAdapter(Node.class, new NodeSerializer());
+        }
+
+        @Override
+        public Gson gson() {
+            return gsonBuilder().create();
         }
     }
 
