@@ -124,6 +124,10 @@ public class NettyKademliaDHTNodeBuilder<K extends Serializable, V extends Seria
     }
 
     protected void fillDefaults() {
+        if (this.nodeSettings == null){
+            this.setNodeSettingsDefault();
+        }
+
         if (this.routingTable == null){
             this.setRoutingTableDefault();
         }
@@ -146,10 +150,6 @@ public class NettyKademliaDHTNodeBuilder<K extends Serializable, V extends Seria
 
         if (this.kademliaNodeServer == null){
             this.setKademliaNodeServerDefault();
-        }
-
-        if (this.nodeSettings == null){
-            this.setNodeSettingsDefault();
         }
     }
 
