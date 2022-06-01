@@ -1,7 +1,7 @@
 package io.ep2p.kademlia.netty.server;
 
 import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
-import io.ep2p.kademlia.netty.factory.KademliaNodeServerInitializerAPIFactory;
+import io.ep2p.kademlia.netty.factory.NettyServerInitializerFactory;
 import io.ep2p.kademlia.node.DHTKademliaNodeAPI;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -22,29 +22,21 @@ public class KademliaNodeServer<K extends Serializable, V extends Serializable> 
 
     private final int port;
     private final String host;
-    private final KademliaNodeServerInitializerAPIFactory kademliaNodeServerInitializerAPIFactory;
+    private final NettyServerInitializerFactory<K, V> nettyServerInitializerFactory;
     private boolean running = false;
 
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
     private ChannelFuture bindFuture;
 
-    public KademliaNodeServer(String host, int port, KademliaNodeServerInitializerAPIFactory kademliaNodeServerInitializerAPIFactory) {
+    public KademliaNodeServer(String host, int port, NettyServerInitializerFactory<K, V> nettyServerInitializerFactory) {
         this.port = port;
         this.host = host;
-        this.kademliaNodeServerInitializerAPIFactory = kademliaNodeServerInitializerAPIFactory;
+        this.nettyServerInitializerFactory = nettyServerInitializerFactory;
     }
 
-    public KademliaNodeServer(int port, KademliaNodeServerInitializerAPIFactory factory) {
+    public KademliaNodeServer(int port, NettyServerInitializerFactory<K, V> factory) {
         this(null, port, factory);
-    }
-
-    public KademliaNodeServer(int port) {
-        this(null, port, new KademliaNodeServerInitializerAPIFactory());
-    }
-
-    public KademliaNodeServer(String host, int port) {
-        this(host, port, new KademliaNodeServerInitializerAPIFactory());
     }
 
     public synchronized void run(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI) {
@@ -53,15 +45,15 @@ public class KademliaNodeServer<K extends Serializable, V extends Serializable> 
         this.bossGroup = new NioEventLoopGroup();
         this.workerGroup = new NioEventLoopGroup();
 
-        KademliaNodeServerInitializer<K, V> kademliaNodeServerInitializer = kademliaNodeServerInitializerAPIFactory.getKademliaNodeServerInitializerAPI();
-        kademliaNodeServerInitializer.registerKademliaNode(dhtKademliaNodeAPI);
+        NettyServerInitializer<K, V> nettyServerInitializer = nettyServerInitializerFactory.getKademliaNodeServerInitializerAPI();
+        nettyServerInitializer.registerKademliaNode(dhtKademliaNodeAPI);
 
         try {
             ServerBootstrap bootstrap = new ServerBootstrap()
                     .group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .handler(new LoggingHandler(LogLevel.INFO))
-                    .childHandler(kademliaNodeServerInitializer)
+                    .childHandler(nettyServerInitializer)
                     .option(ChannelOption.SO_BACKLOG, 128)
                     .option(ChannelOption.SO_KEEPALIVE, false);
 
