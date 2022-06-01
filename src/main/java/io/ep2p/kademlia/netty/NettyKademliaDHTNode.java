@@ -12,13 +12,13 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.concurrent.Future;
 
-public class NettyKadmliaDHTNode<K extends Serializable, V extends Serializable>
+public class NettyKademliaDHTNode<K extends Serializable, V extends Serializable>
         extends DHTKademliaNodeAPIDecorator<BigInteger, NettyConnectionInfo, K, V> {
 
     @Getter
     private final KademliaNodeServer<K, V> kademliaNodeServer;
 
-    public NettyKadmliaDHTNode(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> kademliaNode, KademliaNodeServer<K, V> kademliaNodeServer) {
+    public NettyKademliaDHTNode(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> kademliaNode, KademliaNodeServer<K, V> kademliaNodeServer) {
         super(kademliaNode);
         this.kademliaNodeServer = kademliaNodeServer;
     }

@@ -6,7 +6,7 @@
 
     <groupId>io.ep2p</groupId>
     <artifactId>kademlia-netty</artifactId>
-    <version>0.1.1-RELEASE</version>
+    <version>0.1.2-RELEASE</version>
     <url>https://github.com/ep2p/kademlia-netty</url>
     <name>Kademlia API over Netty</name>
     <description>Java library for kademlia API netty as server, OKHttp as client and Gson as serializer.</description>
@@ -84,6 +84,13 @@
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
             <version>4.9.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.10.19</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>

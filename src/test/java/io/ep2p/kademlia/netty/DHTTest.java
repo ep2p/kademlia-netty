@@ -23,8 +23,8 @@ public class DHTTest {
 
     private static NettyMessageSender<String, String> nettyMessageSender1;
     private static NettyMessageSender<String, String> nettyMessageSender2;
-    private static NettyKadmliaDHTNode<String, String> node1;
-    private static NettyKadmliaDHTNode<String, String> node2;
+    private static NettyKademliaDHTNode<String, String> node1;
+    private static NettyKademliaDHTNode<String, String> node2;
 
 
     @SneakyThrows
