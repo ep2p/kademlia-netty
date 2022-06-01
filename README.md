@@ -149,7 +149,7 @@ Using maven:
 <dependency>
     <groupId>io.ep2p</groupId>
     <artifactId>kademlia-netty</artifactId>
-    <version>0.1.0-RELEASE</version>
+    <version>0.1.2-RELEASE</version>
 </dependency>
 ```
 
