@@ -5,6 +5,7 @@ import io.ep2p.kademlia.NodeSettings;
 import io.ep2p.kademlia.exception.DuplicateStoreRequest;
 import io.ep2p.kademlia.model.LookupAnswer;
 import io.ep2p.kademlia.model.StoreAnswer;
+import io.ep2p.kademlia.netty.builder.NettyKademliaDHTNodeBuilder;
 import io.ep2p.kademlia.netty.client.NettyMessageSender;
 import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
 import io.ep2p.kademlia.node.KeyHashGenerator;
@@ -33,7 +34,6 @@ public class DHTTest {
         NodeSettings.Default.IDENTIFIER_SIZE = 4;
         NodeSettings.Default.BUCKET_SIZE = 100;
         NodeSettings.Default.PING_SCHEDULE_TIME_VALUE = 5;
-        NodeSettings nodeSettings = NodeSettings.Default.build();
 
         KeyHashGenerator<BigInteger, String> keyHashGenerator = new KeyHashGenerator<BigInteger, String>() {
             @Override
@@ -46,26 +46,24 @@ public class DHTTest {
         nettyMessageSender2 = new NettyMessageSender<>();
 
         // node 1
-        node1 = new NettyKademliaDHTNodeBuilder<String, String>()
-                .id(BigInteger.valueOf(1))
-                .connectionInfo(new NettyConnectionInfo("127.0.0.1", NodeHelper.findRandomPort()))
-                .nodeSettings(nodeSettings)
-                .keyHashGenerator(keyHashGenerator)
-                .repository(new SampleRepository())
-                .build();
+        node1 = new NettyKademliaDHTNodeBuilder<String, String>(
+                BigInteger.valueOf(1),
+                new NettyConnectionInfo("127.0.0.1", NodeHelper.findRandomPort()),
+                new SampleRepository(),
+                keyHashGenerator
+        ).build();
         node1.start();
 
 
         Thread.sleep(1000);
 
         // node 2
-        node2 = new NettyKademliaDHTNodeBuilder<String, String>()
-                .id(BigInteger.valueOf(2))
-                .connectionInfo(new NettyConnectionInfo("127.0.0.1", NodeHelper.findRandomPort()))
-                .nodeSettings(nodeSettings)
-                .keyHashGenerator(keyHashGenerator)
-                .repository(new SampleRepository())
-                .build();
+        node2 = new NettyKademliaDHTNodeBuilder<String, String>(
+                BigInteger.valueOf(2),
+                new NettyConnectionInfo("127.0.0.1", NodeHelper.findRandomPort()),
+                new SampleRepository(),
+                keyHashGenerator
+        ).build();
         System.out.println("Bootstrapped? " + node2.start(node1).get(5, TimeUnit.SECONDS));
 
         Thread.sleep(1000);

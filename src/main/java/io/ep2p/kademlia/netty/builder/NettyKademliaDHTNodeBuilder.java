@@ -1,7 +1,8 @@
-package io.ep2p.kademlia.netty;
+package io.ep2p.kademlia.netty.builder;
 
 import io.ep2p.kademlia.NodeSettings;
 import io.ep2p.kademlia.connection.MessageSender;
+import io.ep2p.kademlia.netty.NettyKademliaDHTNode;
 import io.ep2p.kademlia.netty.client.NettyMessageSender;
 import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
 import io.ep2p.kademlia.netty.factory.GsonFactory;
@@ -19,7 +20,6 @@ import io.ep2p.kademlia.table.DefaultRoutingTableFactory;
 import io.ep2p.kademlia.table.RoutingTable;
 import io.ep2p.kademlia.table.RoutingTableFactory;
 import lombok.Getter;
-import lombok.SneakyThrows;
 
 import java.io.Serializable;
 import java.math.BigInteger;
@@ -29,35 +29,25 @@ import java.util.List;
 
 @Getter
 public class NettyKademliaDHTNodeBuilder<K extends Serializable, V extends Serializable> {
-    private BigInteger id;
-    private NettyConnectionInfo connectionInfo;
+    private final BigInteger id;
+    private final NettyConnectionInfo connectionInfo;
     private RoutingTable<BigInteger, NettyConnectionInfo, Bucket<BigInteger, NettyConnectionInfo>> routingTable;
     private MessageSender<BigInteger, NettyConnectionInfo> messageSender;
     private NodeSettings nodeSettings;
     private GsonFactory gsonFactory;
-    private KademliaRepository<K, V> repository;
-    private KeyHashGenerator<BigInteger, K> keyHashGenerator;
+    private final KademliaRepository<K, V> repository;
+    private final KeyHashGenerator<BigInteger, K> keyHashGenerator;
     private KademliaNodeServer<K, V> kademliaNodeServer;
     private KademliaMessageHandlerFactory<K, V> kademliaMessageHandlerFactory;
     private NettyServerInitializerFactory<K, V> nettyServerInitializerFactory;
 
     protected List<String> required = new ArrayList<>();
 
-    public NettyKademliaDHTNodeBuilder() {
-        this.required.add("id");
-        this.required.add("connectionInfo");
-        this.required.add("repository");
-        this.required.add("keyHashGenerator");
-    }
-
-    public NettyKademliaDHTNodeBuilder<K, V> id(BigInteger id){
+    public NettyKademliaDHTNodeBuilder(BigInteger id, NettyConnectionInfo connectionInfo, KademliaRepository<K, V> repository, KeyHashGenerator<BigInteger, K> keyHashGenerator) {
         this.id = id;
-        return this;
-    }
-
-    public NettyKademliaDHTNodeBuilder<K, V> connectionInfo(NettyConnectionInfo connectionInfo){
         this.connectionInfo = connectionInfo;
-        return this;
+        this.repository = repository;
+        this.keyHashGenerator = keyHashGenerator;
     }
 
     public NettyKademliaDHTNodeBuilder<K, V> routingTable(RoutingTable<BigInteger, NettyConnectionInfo, Bucket<BigInteger, NettyConnectionInfo>> routingTable){
@@ -72,16 +62,6 @@ public class NettyKademliaDHTNodeBuilder<K extends Serializable, V extends Seria
 
     public NettyKademliaDHTNodeBuilder<K, V> nodeSettings(NodeSettings nodeSettings){
         this.nodeSettings = nodeSettings;
-        return this;
-    }
-
-    public NettyKademliaDHTNodeBuilder<K, V> repository(KademliaRepository<K, V> repository){
-        this.repository = repository;
-        return this;
-    }
-
-    public NettyKademliaDHTNodeBuilder<K, V> keyHashGenerator(KeyHashGenerator<BigInteger, K> keyHashGenerator){
-        this.keyHashGenerator = keyHashGenerator;
         return this;
     }
 
@@ -106,10 +86,6 @@ public class NettyKademliaDHTNodeBuilder<K extends Serializable, V extends Seria
     }
 
     public NettyKademliaDHTNode<K, V> build(){
-        if (!requiredFulfilled()){
-            throw new IllegalStateException("Can not build until required parameters are set");
-        }
-
         fillDefaults();
 
         DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> kademliaNode = new DHTKademliaNode<>(
@@ -182,17 +158,6 @@ public class NettyKademliaDHTNodeBuilder<K extends Serializable, V extends Seria
 
     protected void setMessageSenderDefault(){
         this.messageSender = new NettyMessageSender<K, V>();
-    }
-
-
-    @SneakyThrows
-    protected boolean requiredFulfilled() {
-        for (String f : this.required) {
-            if (this.getClass().getDeclaredField(f).get(this) == null) {
-                return false;
-            }
-        }
-        return true;
     }
 
 }

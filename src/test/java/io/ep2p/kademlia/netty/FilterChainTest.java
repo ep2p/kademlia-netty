@@ -2,6 +2,7 @@ package io.ep2p.kademlia.netty;
 
 import io.ep2p.kademlia.NodeSettings;
 import io.ep2p.kademlia.exception.DuplicateStoreRequest;
+import io.ep2p.kademlia.netty.builder.NettyKademliaDHTNodeBuilder;
 import io.ep2p.kademlia.netty.client.NettyMessageSender;
 import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
 import io.ep2p.kademlia.netty.factory.GsonFactory;
@@ -19,6 +20,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -49,12 +51,12 @@ public class FilterChainTest {
         nettyMessageSender1 = new NettyMessageSender<>();
 
         // node 1
-        node1 = new NettyKademliaDHTNodeBuilder<String, String>()
-                .id(BigInteger.valueOf(1))
-                .connectionInfo(new NettyConnectionInfo("127.0.0.1", NodeHelper.findRandomPort()))
-                .keyHashGenerator(keyHashGenerator)
-                .repository(new SampleRepository())
-                .build();
+        node1 = new NettyKademliaDHTNodeBuilder<String, String>(
+                BigInteger.valueOf(1),
+                new NettyConnectionInfo("127.0.0.1", NodeHelper.findRandomPort()),
+                new SampleRepository(),
+                keyHashGenerator
+        ).build();
         node1.start();
 
 
@@ -78,21 +80,29 @@ public class FilterChainTest {
         filterChain.addFilterAfter(EmptyFilter.class, mockFilter);
 
 
-        NettyKademliaDHTNode<String, String> node2 = new NettyKademliaDHTNodeBuilder<String, String>()
-                .id(BigInteger.valueOf(2))
-                .connectionInfo(new NettyConnectionInfo("127.0.0.1", NodeHelper.findRandomPort()))
-                .keyHashGenerator(node1.getKeyHashGenerator())
-                .repository(new SampleRepository())
+        NettyKademliaDHTNode<String, String> node2 = new NettyKademliaDHTNodeBuilder<String, String>(
+                BigInteger.valueOf(2),
+                new NettyConnectionInfo("127.0.0.1", NodeHelper.findRandomPort()),
+                new SampleRepository(),
+                node1.getKeyHashGenerator()
+        )
                 .kademliaMessageHandlerFactory(new KademliaMessageHandlerFactory.DefaultKademliaMessageHandlerFactory<>(filterChain))
                 .build();
         System.out.println("Bootstrapped? " + node2.start(node1).get(5, TimeUnit.SECONDS));
 
         Thread.sleep(1000);
+
+        CountDownLatch latch = new CountDownLatch(1);
+        new Thread(() -> {
+            node2.stop();
+            latch.countDown();
+        }).start();
+
         verify(mockFilter, times(1));
 
         Assertions.assertTrue(filterChain.getFilters().get(0) instanceof EmptyFilter);
         Assertions.assertFalse(filterChain.getFilters().get(1) instanceof KademliaMainHandlerFilter);
 
-        node2.stop();
+        latch.await();
     }
 }
