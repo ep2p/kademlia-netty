@@ -3,6 +3,7 @@ package io.ep2p.kademlia.netty;
 import io.ep2p.kademlia.NodeSettings;
 import io.ep2p.kademlia.model.LookupAnswer;
 import io.ep2p.kademlia.model.StoreAnswer;
+import io.ep2p.kademlia.netty.builder.NettyKademliaDHTNodeBuilder;
 import io.ep2p.kademlia.netty.client.NettyMessageSender;
 import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
 import io.ep2p.kademlia.node.KeyHashGenerator;
@@ -37,25 +38,23 @@ public class Example {
         };
 
 
-        NettyKademliaDHTNode<String, String> node1 = new NettyKademliaDHTNodeBuilder<String, String>()
-                .id(BigInteger.valueOf(1))
-                .connectionInfo(new NettyConnectionInfo("127.0.0.1", 8000))
-                .nodeSettings(nodeSettings)
-                .keyHashGenerator(keyHashGenerator)
-                .repository(new SampleRepository())
-                .build();
+        NettyKademliaDHTNode<String, String> node1 = new NettyKademliaDHTNodeBuilder<String, String>(
+                BigInteger.valueOf(2),
+                new NettyConnectionInfo("127.0.0.1", 8000),
+                new SampleRepository(),
+                keyHashGenerator
+        ).build();
         node1.start();
 
         Thread.sleep(2000);
 
         // node 2
-        NettyKademliaDHTNode< String, String> node2 = new NettyKademliaDHTNodeBuilder<String, String>()
-                .id(BigInteger.valueOf(2))
-                .connectionInfo(new NettyConnectionInfo("127.0.0.1", 8001))
-                .nodeSettings(nodeSettings)
-                .keyHashGenerator(keyHashGenerator)
-                .repository(new SampleRepository())
-                .build();
+        NettyKademliaDHTNode< String, String> node2 = new NettyKademliaDHTNodeBuilder<String, String>(
+                BigInteger.valueOf(2),
+                new NettyConnectionInfo("127.0.0.1", 8001),
+                new SampleRepository(),
+                keyHashGenerator
+        ).build();
 
         System.out.println("Bootstrapped? " + node2.start(node1).get(5, TimeUnit.SECONDS));
 
