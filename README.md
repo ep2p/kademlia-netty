@@ -87,13 +87,12 @@ Now that we have our DHT repository ready, it's time to create a basic node. Let
 
 // run our node on 127.0.0.1 : 8000
 
-NettyKadmliaDHTNode<String, String> node1 = new NettyKademliaDHTNodeBuilder<String, String>()
-                .id(BigInteger.valueOf(1))
-                .connectionInfo(new NettyConnectionInfo("127.0.0.1", 8000))
-                .nodeSettings(nodeSettings) // remove if not overriding node settings
-                .keyHashGenerator(keyHashGenerator)
-                .repository(repository)
-                .build();
+NettyKadmliaDHTNode<String, String> node1 = new NettyKademliaDHTNodeBuilder<String, String>(
+            BigInteger.valueOf(1),
+            new NettyConnectionInfo("127.0.0.1", 8000),
+            repository,
+            keyHashGenerator
+        ).build();
 
 
 // we can start our node right now:
@@ -109,14 +108,13 @@ NettyKadmliaDHTNode<String, String> node2 = ...;
 
 // instead of running it, bootstrap it with first node like:
 
-// init bootstrap node. use information from node 1
+// use information from node 1 to bootstrap node 2
 Node<BigInteger, NettyConnectionInfo> bootstrapNode = new NettyBigIntegerExternalNode(new NettyConnectionInfo("127.0.0.1", 8000), BigInteger.valueOf(1), new Date());
-
 node2.start(bootstrapNode)
 
 ```
 
-Now its time to test DHT:
+Now it's time to test DHT:
 
 ```java
 StoreAnswer<BigInteger, String> storeAnswer = node2.store("Key", "Your Value Here").get();
@@ -149,7 +147,7 @@ Using maven:
 <dependency>
     <groupId>io.ep2p</groupId>
     <artifactId>kademlia-netty</artifactId>
-    <version>0.1.2-RELEASE</version>
+    <version>0.1.3-RELEASE</version>
 </dependency>
 ```
 
