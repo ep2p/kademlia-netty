@@ -77,7 +77,8 @@ public class KademliaNodeServer<K extends Serializable, V extends Serializable> 
             bossGroup.shutdownGracefully().sync();
             workerGroup.shutdownGracefully().sync();
         }
-        this.bindFuture.channel().closeFuture().sync();
+        if (bindFuture != null)
+            this.bindFuture.channel().closeFuture().sync();
     }
 
 }
