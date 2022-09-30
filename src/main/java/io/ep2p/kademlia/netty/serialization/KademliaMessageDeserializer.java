@@ -49,15 +49,16 @@ public class KademliaMessageDeserializer<K extends Serializable, V extends Seria
     public KademliaMessage<BigInteger, NettyConnectionInfo, Serializable> deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
 
         JsonObject jsonObject = jsonElement.getAsJsonObject();
-        String type_ = jsonObject.getAsJsonPrimitive("type").getAsString();
+        String messageType = jsonObject.getAsJsonPrimitive("type").getAsString();
         Node<BigInteger, NettyConnectionInfo> node = jsonDeserializationContext.deserialize(
                 jsonObject.getAsJsonObject("node"),
                 NettyBigIntegerExternalNode.class
         );
-        Class<?> aClass = this.messageClassRegistry.get(type_);
-        KademliaMessage<BigInteger, NettyConnectionInfo, Serializable> o = (KademliaMessage<BigInteger, NettyConnectionInfo, Serializable>) aClass.newInstance();
-        o.setData(getData(type_, jsonObject, jsonDeserializationContext));
-        o.setType(type_);
+        Class<?> aClass = this.messageClassRegistry.get(messageType);
+        @SuppressWarnings("unchecked")
+        KademliaMessage<BigInteger, NettyConnectionInfo, Serializable> o = (KademliaMessage<BigInteger, NettyConnectionInfo, Serializable>) aClass.getConstructor().newInstance();
+        o.setData(getData(messageType, jsonObject, jsonDeserializationContext));
+        o.setType(messageType);
         o.setNode(node);
         o.setAlive(true);
         return o;

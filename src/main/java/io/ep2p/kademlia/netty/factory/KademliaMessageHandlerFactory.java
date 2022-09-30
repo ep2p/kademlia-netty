@@ -10,10 +10,10 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import java.io.Serializable;
 import java.math.BigInteger;
 
-public abstract class KademliaMessageHandlerFactory<K extends Serializable, V extends Serializable> {
-    public abstract SimpleChannelInboundHandler<FullHttpRequest> getKademliaMessageHandler(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI);
+public interface KademliaMessageHandlerFactory<K extends Serializable, V extends Serializable> {
+    SimpleChannelInboundHandler<FullHttpRequest> getKademliaMessageHandler(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI);
 
-    public static class DefaultKademliaMessageHandlerFactory<K extends Serializable, V extends Serializable> extends KademliaMessageHandlerFactory<K, V> {
+    class DefaultKademliaMessageHandlerFactory<K extends Serializable, V extends Serializable> implements KademliaMessageHandlerFactory<K, V> {
         private final NettyKademliaServerFilterChain<K, V> filterChain;
 
         public DefaultKademliaMessageHandlerFactory(NettyKademliaServerFilterChain<K, V> filterChain) {

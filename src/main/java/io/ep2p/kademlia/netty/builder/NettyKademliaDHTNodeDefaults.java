@@ -28,90 +28,66 @@ public class NettyKademliaDHTNodeDefaults {
 
     public static <K extends Serializable, V extends Serializable> void run(NettyKademliaDHTNodeBuilder<K, V> builder){
         List<DefaultFillerPipeline<K, V>> pipeline = getPipeline();
-        pipeline.forEach(pipe -> {
-            pipe.process(builder);
-        });
+        pipeline.forEach(pipe -> pipe.process(builder));
     }
 
     private static <K extends Serializable, V extends Serializable> List<DefaultFillerPipeline<K, V>> getPipeline(){
         List<DefaultFillerPipeline<K, V>> pipelines = new ArrayList<>();
 
-        pipelines.add(new DefaultFillerPipeline<K, V>() {
-            @Override
-            public void process(NettyKademliaDHTNodeBuilder<K, V> builder) {
-                if (builder.getNodeSettings() == null) {
-                    builder.nodeSettings(NodeSettings.Default.build());
-                }
+        pipelines.add(builder -> {
+            if (builder.getNodeSettings() == null) {
+                builder.nodeSettings(NodeSettings.Default.build());
             }
         });
 
-        pipelines.add(new DefaultFillerPipeline<K, V>() {
-            @Override
-            public void process(NettyKademliaDHTNodeBuilder<K, V> builder) {
-                if (builder.getRoutingTable() == null) {
-                    RoutingTableFactory<BigInteger, NettyConnectionInfo, Bucket<BigInteger, NettyConnectionInfo>> routingTableFactory = new DefaultRoutingTableFactory<>(builder.getNodeSettings());
-                    builder.routingTable(routingTableFactory.getRoutingTable(builder.getId()));
-                }
+        pipelines.add(builder -> {
+            if (builder.getRoutingTable() == null) {
+                RoutingTableFactory<BigInteger, NettyConnectionInfo, Bucket<BigInteger, NettyConnectionInfo>> routingTableFactory = new DefaultRoutingTableFactory<>(builder.getNodeSettings());
+                builder.routingTable(routingTableFactory.getRoutingTable(builder.getId()));
             }
         });
 
-        pipelines.add(new DefaultFillerPipeline<K, V>() {
-            @Override
-            public void process(NettyKademliaDHTNodeBuilder<K, V> builder) {
-                if (builder.getGsonFactory() == null) {
-                    builder.gsonFactory(new GsonFactory.DefaultGsonFactory<>());
-                }
+        pipelines.add(builder -> {
+            if (builder.getGsonFactory() == null) {
+                builder.gsonFactory(new GsonFactory.DefaultGsonFactory<>());
             }
         });
 
-        pipelines.add(new DefaultFillerPipeline<K, V>() {
-            @Override
-            public void process(NettyKademliaDHTNodeBuilder<K, V> builder) {
-                if (builder.getMessageSender() == null) {
-                    builder.messageSender( new NettyMessageSender<K, V>(builder.getGsonFactory().gson()));
-                }
+        pipelines.add(builder -> {
+            if (builder.getMessageSender() == null) {
+                builder.messageSender( new NettyMessageSender<>(builder.getGsonFactory().gson()));
             }
         });
 
-        pipelines.add(new DefaultFillerPipeline<K, V>() {
-            @Override
-            public void process(NettyKademliaDHTNodeBuilder<K, V> builder) {
-                if (builder.getKademliaMessageHandlerFactory() == null) {
-                    NettyKademliaServerFilterChain<K, V> filterChain = new NettyKademliaServerFilterChain<>();
-                    filterChain.addFilter(new KademliaMainHandlerFilter<>(builder.getGsonFactory().gson()));
-                    builder.kademliaMessageHandlerFactory(new KademliaMessageHandlerFactory.DefaultKademliaMessageHandlerFactory<>(filterChain));
-                }
+        pipelines.add(builder -> {
+            if (builder.getKademliaMessageHandlerFactory() == null) {
+                NettyKademliaServerFilterChain<K, V> filterChain = new NettyKademliaServerFilterChain<>();
+                filterChain.addFilter(new KademliaMainHandlerFilter<>(builder.getGsonFactory().gson()));
+                builder.kademliaMessageHandlerFactory(new KademliaMessageHandlerFactory.DefaultKademliaMessageHandlerFactory<>(filterChain));
             }
         });
 
-        pipelines.add(new DefaultFillerPipeline<K, V>() {
-            @Override
-            public void process(NettyKademliaDHTNodeBuilder<K, V> builder) {
-                if (builder.getNettyServerInitializerFactory() == null) {
-                    builder.nettyServerInitializerFactory(
-                            new NettyServerInitializerFactory.DefaultNettyServerInitializerFactory<>(
-                                    builder.getKademliaMessageHandlerFactory()
-                            )
-                    );
-                }
+        pipelines.add(builder -> {
+            if (builder.getNettyServerInitializerFactory() == null) {
+                builder.nettyServerInitializerFactory(
+                        new NettyServerInitializerFactory.DefaultNettyServerInitializerFactory<>(
+                                builder.getKademliaMessageHandlerFactory()
+                        )
+                );
             }
         });
 
-        pipelines.add(new DefaultFillerPipeline<K, V>() {
-            @Override
-            public void process(NettyKademliaDHTNodeBuilder<K, V> builder) {
-                if (builder.getKademliaNodeServer() == null){
-                    builder.kademliaNodeServer(
-                            new KademliaNodeServer<>(
-                                    builder.getConnectionInfo().getHost(),
-                                    builder.getConnectionInfo().getPort(),
-                                    builder.getNettyServerInitializerFactory()
-                            )
-                    );
-                }
+        pipelines.add(builder -> {
+            if (builder.getKademliaNodeServer() == null){
+                builder.kademliaNodeServer(
+                        new KademliaNodeServer<>(
+                                builder.getConnectionInfo().getHost(),
+                                builder.getConnectionInfo().getPort(),
+                                builder.getNettyServerInitializerFactory()
+                        )
+                );
             }
         });
-
 
         return pipelines;
     }

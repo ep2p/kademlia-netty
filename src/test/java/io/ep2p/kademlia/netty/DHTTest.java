@@ -30,23 +30,18 @@ public class DHTTest {
 
     @SneakyThrows
     @BeforeAll
-    public static void init() throws InterruptedException {
+    public static void init() {
         NodeSettings.Default.IDENTIFIER_SIZE = 4;
         NodeSettings.Default.BUCKET_SIZE = 100;
         NodeSettings.Default.PING_SCHEDULE_TIME_VALUE = 5;
 
-        KeyHashGenerator<BigInteger, String> keyHashGenerator = new KeyHashGenerator<BigInteger, String>() {
-            @Override
-            public BigInteger generateHash(String key) {
-                return new BoundedHashUtil(NodeSettings.Default.IDENTIFIER_SIZE).hash(key.hashCode(), BigInteger.class);
-            }
-        };
+        KeyHashGenerator<BigInteger, String> keyHashGenerator = key -> new BoundedHashUtil(NodeSettings.Default.IDENTIFIER_SIZE).hash(key.hashCode(), BigInteger.class);
 
         nettyMessageSender1 = new NettyMessageSender<>();
         nettyMessageSender2 = new NettyMessageSender<>();
 
         // node 1
-        node1 = new NettyKademliaDHTNodeBuilder<String, String>(
+        node1 = new NettyKademliaDHTNodeBuilder<>(
                 BigInteger.valueOf(1),
                 new NettyConnectionInfo("127.0.0.1", NodeHelper.findRandomPort()),
                 new SampleRepository(),
@@ -55,10 +50,8 @@ public class DHTTest {
         node1.start();
 
 
-        Thread.sleep(1000);
-
         // node 2
-        node2 = new NettyKademliaDHTNodeBuilder<String, String>(
+        node2 = new NettyKademliaDHTNodeBuilder<>(
                 BigInteger.valueOf(2),
                 new NettyConnectionInfo("127.0.0.1", NodeHelper.findRandomPort()),
                 new SampleRepository(),
@@ -66,7 +59,6 @@ public class DHTTest {
         ).build();
         System.out.println("Bootstrapped? " + node2.start(node1).get(5, TimeUnit.SECONDS));
 
-        Thread.sleep(1000);
     }
 
     @AfterAll
@@ -78,28 +70,28 @@ public class DHTTest {
     }
 
     @Test
-    public void testDhtStoreLookup() throws DuplicateStoreRequest, ExecutionException, InterruptedException {
+    void testDhtStoreLookup() throws DuplicateStoreRequest, ExecutionException, InterruptedException {
         String[] values = new String[]{"V", "ABC", "SOME VALUE"};
         for (String v : values){
             System.out.println("Testing DHT for K: " + v.hashCode() + " & V: " + v);
             StoreAnswer<BigInteger, String> storeAnswer = node2.store("" + v.hashCode(), v).get();
-            Assertions.assertEquals(storeAnswer.getResult(), StoreAnswer.Result.STORED);
+            Assertions.assertEquals(StoreAnswer.Result.STORED, storeAnswer.getResult());
 
             LookupAnswer<BigInteger, String, String> lookupAnswer = node1.lookup("" + v.hashCode()).get();
-            Assertions.assertEquals(lookupAnswer.getResult(), LookupAnswer.Result.FOUND);
+            Assertions.assertEquals(LookupAnswer.Result.FOUND, lookupAnswer.getResult());
             Assertions.assertEquals(lookupAnswer.getValue(), v);
             System.out.println("Node " + node1.getId() + " found " + v.hashCode() + " from " + lookupAnswer.getNodeId());
 
             lookupAnswer = node2.lookup("" + v.hashCode()).get();
-            Assertions.assertEquals(lookupAnswer.getResult(), LookupAnswer.Result.FOUND);
-            Assertions.assertEquals(lookupAnswer.getValue(), v);
+            Assertions.assertEquals(LookupAnswer.Result.FOUND, lookupAnswer.getResult());
+            Assertions.assertEquals(v, lookupAnswer.getValue());
             System.out.println("Node " + node2.getId() + " found " + v.hashCode() + " from " + lookupAnswer.getNodeId());
         }
 
     }
 
     @Test
-    public void testNetworkKnowledge(){
+    void testNetworkKnowledge(){
         Assertions.assertTrue(node1.getRoutingTable().contains(BigInteger.valueOf(2)));
         Assertions.assertTrue(node2.getRoutingTable().contains(BigInteger.valueOf(1)));
     }

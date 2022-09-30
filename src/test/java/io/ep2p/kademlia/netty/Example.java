@@ -21,24 +21,17 @@ import java.util.concurrent.TimeoutException;
 public class Example {
 
     @SneakyThrows
-    public static void main(String[] args) throws ExecutionException, InterruptedException, TimeoutException {
+    public static void main(String[] args) {
         NodeSettings.Default.IDENTIFIER_SIZE = 4;
         NodeSettings.Default.BUCKET_SIZE = 100;
         NodeSettings.Default.PING_SCHEDULE_TIME_VALUE = 5;
-        NodeSettings nodeSettings = NodeSettings.Default.build();
 
         NettyMessageSender<String, String> nettyMessageSender = new NettyMessageSender<>();
 
-        RoutingTableFactory<BigInteger, NettyConnectionInfo, Bucket<BigInteger, NettyConnectionInfo>> routingTableFactory = new DefaultRoutingTableFactory<>(nodeSettings);
-        KeyHashGenerator<BigInteger, String> keyHashGenerator = new KeyHashGenerator<BigInteger, String>() {
-            @Override
-            public BigInteger generateHash(String key) {
-                return new BoundedHashUtil(NodeSettings.Default.IDENTIFIER_SIZE).hash(key.hashCode(), BigInteger.class);
-            }
-        };
+        KeyHashGenerator<BigInteger, String> keyHashGenerator = key ->  new BoundedHashUtil(NodeSettings.Default.IDENTIFIER_SIZE).hash(key.hashCode(), BigInteger.class);
 
 
-        NettyKademliaDHTNode<String, String> node1 = new NettyKademliaDHTNodeBuilder<String, String>(
+        NettyKademliaDHTNode<String, String> node1 = new NettyKademliaDHTNodeBuilder<>(
                 BigInteger.valueOf(2),
                 new NettyConnectionInfo("127.0.0.1", 8000),
                 new SampleRepository(),
@@ -46,10 +39,9 @@ public class Example {
         ).build();
         node1.start();
 
-        Thread.sleep(2000);
 
         // node 2
-        NettyKademliaDHTNode< String, String> node2 = new NettyKademliaDHTNodeBuilder<String, String>(
+        NettyKademliaDHTNode< String, String> node2 = new NettyKademliaDHTNodeBuilder<>(
                 BigInteger.valueOf(2),
                 new NettyConnectionInfo("127.0.0.1", 8001),
                 new SampleRepository(),

@@ -9,6 +9,7 @@ import io.ep2p.kademlia.node.KademliaNodeAPI;
 import io.ep2p.kademlia.node.Node;
 import io.ep2p.kademlia.protocol.MessageType;
 import io.ep2p.kademlia.protocol.message.KademliaMessage;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 
 import java.io.IOException;
@@ -20,6 +21,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+
+@Slf4j
 public class NettyMessageSender<K extends Serializable, V extends Serializable> implements MessageSender<BigInteger, NettyConnectionInfo> {
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
     private final Gson gson;
@@ -59,12 +62,10 @@ public class NettyMessageSender<K extends Serializable, V extends Serializable> 
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
-            String response_str = Objects.requireNonNull(response.body()).string();
-            KademliaMessage<BigInteger, NettyConnectionInfo, I> o = gson.fromJson(response_str, new TypeToken<KademliaMessage<BigInteger, NettyConnectionInfo, Serializable>>() {}.getType());
-            return o;
+            String responseStr = Objects.requireNonNull(response.body()).string();
+            return gson.fromJson(responseStr, new TypeToken<KademliaMessage<BigInteger, NettyConnectionInfo, Serializable>>() {}.getType());
         } catch (IOException e) {
-            //todo
-            e.printStackTrace();
+            log.error("Failed to send message to " + caller.getId(), e);
             return new KademliaMessage<BigInteger, NettyConnectionInfo, I>() {
                 @Override
                 public I getData() {
@@ -91,12 +92,7 @@ public class NettyMessageSender<K extends Serializable, V extends Serializable> 
 
     @Override
     public <O extends Serializable> void sendAsyncMessage(KademliaNodeAPI<BigInteger, NettyConnectionInfo> caller, Node<BigInteger, NettyConnectionInfo> receiver, KademliaMessage<BigInteger, NettyConnectionInfo, O> message) {
-        executorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                sendMessage(caller, receiver, message);
-            }
-        });
+        executorService.submit(() -> sendMessage(caller, receiver, message));
     }
 
     public void stop(){

@@ -35,32 +35,23 @@ public class FilterChainTest {
 
     @SneakyThrows
     @BeforeAll
-    public static void init() throws InterruptedException {
+    public static void init() {
         NodeSettings.Default.IDENTIFIER_SIZE = 4;
         NodeSettings.Default.BUCKET_SIZE = 100;
         NodeSettings.Default.PING_SCHEDULE_TIME_VALUE = 5;
-        NodeSettings nodeSettings = NodeSettings.Default.build();
 
-        KeyHashGenerator<BigInteger, String> keyHashGenerator = new KeyHashGenerator<BigInteger, String>() {
-            @Override
-            public BigInteger generateHash(String key) {
-                return new BoundedHashUtil(NodeSettings.Default.IDENTIFIER_SIZE).hash(key.hashCode(), BigInteger.class);
-            }
-        };
+        KeyHashGenerator<BigInteger, String> keyHashGenerator = key -> new BoundedHashUtil(NodeSettings.Default.IDENTIFIER_SIZE).hash(key.hashCode(), BigInteger.class);
 
         nettyMessageSender1 = new NettyMessageSender<>();
 
         // node 1
-        node1 = new NettyKademliaDHTNodeBuilder<String, String>(
+        node1 = new NettyKademliaDHTNodeBuilder<>(
                 BigInteger.valueOf(1),
                 new NettyConnectionInfo("127.0.0.1", NodeHelper.findRandomPort()),
                 new SampleRepository(),
                 keyHashGenerator
         ).build();
         node1.start();
-
-
-        Thread.sleep(1000);
 
     }
 
@@ -71,7 +62,8 @@ public class FilterChainTest {
     }
 
     @Test
-    public void testFilterChain() throws DuplicateStoreRequest, ExecutionException, InterruptedException, IOException, TimeoutException {
+    void testFilterChain() throws ExecutionException, InterruptedException, IOException, TimeoutException {
+        @SuppressWarnings("unchecked")
         NettyKademliaServerFilter<String, String> mockFilter = mock(NettyKademliaServerFilter.class);
 
         NettyKademliaServerFilterChain<String, String> filterChain = new NettyKademliaServerFilterChain<>();
@@ -80,7 +72,7 @@ public class FilterChainTest {
         filterChain.addFilterAfter(EmptyFilter.class, mockFilter);
 
 
-        NettyKademliaDHTNode<String, String> node2 = new NettyKademliaDHTNodeBuilder<String, String>(
+        NettyKademliaDHTNode<String, String> node2 = new NettyKademliaDHTNodeBuilder<>(
                 BigInteger.valueOf(2),
                 new NettyConnectionInfo("127.0.0.1", NodeHelper.findRandomPort()),
                 new SampleRepository(),
@@ -90,15 +82,12 @@ public class FilterChainTest {
                 .build();
         System.out.println("Bootstrapped? " + node2.start(node1).get(5, TimeUnit.SECONDS));
 
-        Thread.sleep(1000);
 
         CountDownLatch latch = new CountDownLatch(1);
         new Thread(() -> {
             node2.stop();
             latch.countDown();
         }).start();
-
-        verify(mockFilter, times(1));
 
         Assertions.assertTrue(filterChain.getFilters().get(0) instanceof EmptyFilter);
         Assertions.assertFalse(filterChain.getFilters().get(1) instanceof KademliaMainHandlerFilter);

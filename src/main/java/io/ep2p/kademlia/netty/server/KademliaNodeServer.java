@@ -12,12 +12,14 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
 import java.math.BigInteger;
 
 
 @Getter
+@Slf4j
 public class KademliaNodeServer<K extends Serializable, V extends Serializable> {
 
     private final int port;
@@ -29,17 +31,17 @@ public class KademliaNodeServer<K extends Serializable, V extends Serializable> 
     private EventLoopGroup workerGroup;
     private ChannelFuture bindFuture;
 
-    public KademliaNodeServer(String host, int port, NettyServerInitializerFactory<K, V> nettyServerInitializerFactory) {
+    public KademliaNodeServer(String host, int port, NettyServerInitializerFactory<K, V> factory) {
         this.port = port;
         this.host = host;
-        this.nettyServerInitializerFactory = nettyServerInitializerFactory;
+        this.nettyServerInitializerFactory = factory;
     }
 
     public KademliaNodeServer(int port, NettyServerInitializerFactory<K, V> factory) {
         this(null, port, factory);
     }
 
-    public synchronized void run(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI) {
+    public synchronized void run(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI) throws InterruptedException {
         assert !running;
 
         this.bossGroup = new NioEventLoopGroup();
@@ -58,40 +60,24 @@ public class KademliaNodeServer<K extends Serializable, V extends Serializable> 
                     .option(ChannelOption.SO_KEEPALIVE, false);
 
             ChannelFuture bind = host != null ? bootstrap.bind(host, port) : bootstrap.bind(port);
+            running = true;
             this.bindFuture = bind.sync();
 
         } catch (InterruptedException e) {
-            //todo
-            e.printStackTrace();
+            log.error("Kademlia Node Server interrupted", e);
             stop();
+            throw e;
         }
 
-        running = true;
     }
 
-    public synchronized void stop(){
-        if (bossGroup != null && workerGroup != null){
-            try {
-                bossGroup.shutdownGracefully().sync();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            try {
-                workerGroup.shutdownGracefully().sync();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        try {
-            this.bindFuture.channel().closeFuture().sync();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-
-
+    public synchronized void stop() throws InterruptedException {
         this.running = false;
-
+        if (bossGroup != null && workerGroup != null){
+            bossGroup.shutdownGracefully().sync();
+            workerGroup.shutdownGracefully().sync();
+        }
+        this.bindFuture.channel().closeFuture().sync();
     }
 
 }

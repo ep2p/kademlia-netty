@@ -37,7 +37,7 @@ public class SerializationTest {
     }
 
     @Test
-    public void testDHTLookupSerialization(){
+    void testDHTLookupSerialization(){
         DHTLookupKademliaMessage<BigInteger, NettyConnectionInfo, String> kademliaMessage = new DHTLookupKademliaMessage<>();
         kademliaMessage.setData(new DHTLookupKademliaMessage.DHTLookup<>(node, "key", 1));
         kademliaMessage.setNode(node);
@@ -58,7 +58,7 @@ public class SerializationTest {
     }
 
     @Test
-    public void testDHTLookUpSerialization(){
+    void testDHTLookUpSerialization(){
         DHTLookupResultKademliaMessage<BigInteger, NettyConnectionInfo, String, String> kademliaMessage = new DHTLookupResultKademliaMessage<>();
         kademliaMessage.setData(new DHTLookupResultKademliaMessage.DHTLookupResult<>(LookupAnswer.Result.FOUND, "key", "value"));
         kademliaMessage.setNode(node);
@@ -76,7 +76,7 @@ public class SerializationTest {
     }
 
     @Test
-    public void testDHTStoreSerialization(){
+    void testDHTStoreSerialization(){
         DHTStoreKademliaMessage<BigInteger, NettyConnectionInfo, String, String> kademliaMessage = new DHTStoreKademliaMessage<>();
 
         kademliaMessage.setData(new DHTStoreKademliaMessage.DHTData<>(node, "key", "value"));
@@ -94,7 +94,7 @@ public class SerializationTest {
     }
 
     @Test
-    public void testDHTStoreResultSerialization(){
+    void testDHTStoreResultSerialization(){
         DHTStoreResultKademliaMessage<BigInteger, NettyConnectionInfo, String> kademliaMessage = new DHTStoreResultKademliaMessage<>();
 
         kademliaMessage.setData(new DHTStoreResultKademliaMessage.DHTStoreResult<>("key", StoreAnswer.Result.STORED));
@@ -112,7 +112,7 @@ public class SerializationTest {
     }
 
     @Test
-    public void testEmptyKademliaMessageSerialization(){
+    void testEmptyKademliaMessageSerialization(){
         EmptyKademliaMessage<BigInteger, NettyConnectionInfo> kademliaMessage = new EmptyKademliaMessage<>();
         kademliaMessage.setNode(node);
 
@@ -128,7 +128,7 @@ public class SerializationTest {
     }
 
     @Test
-    public void testFindNodeRequestSerialization(){
+    void testFindNodeRequestSerialization(){
         FindNodeRequestMessage<BigInteger, NettyConnectionInfo> kademliaMessage = new FindNodeRequestMessage<>();
         kademliaMessage.setNode(node);
         kademliaMessage.setData(BigInteger.valueOf(100));
@@ -145,7 +145,7 @@ public class SerializationTest {
     }
 
     @Test
-    public void testExternalNodeSerialization(){
+    void testExternalNodeSerialization(){
         ExternalNode<BigInteger, NettyConnectionInfo> externalNode = new BigIntegerExternalNode<>(node, BigInteger.valueOf(1));
 
         String json = gson.toJson(externalNode);
