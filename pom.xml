@@ -6,7 +6,7 @@
 
     <groupId>io.ep2p</groupId>
     <artifactId>kademlia-netty</artifactId>
-    <version>0.1.3-RELEASE</version>
+    <version>0.1.4-RELEASE</version>
     <url>https://github.com/ep2p/kademlia-netty</url>
     <name>Kademlia API over Netty</name>
     <description>Java library for kademlia API netty as server, OKHttp as client and Gson as serializer.</description>
