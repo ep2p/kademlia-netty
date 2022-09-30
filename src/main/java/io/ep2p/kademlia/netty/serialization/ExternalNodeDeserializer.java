@@ -14,10 +14,11 @@ import java.math.BigInteger;
 public class ExternalNodeDeserializer implements JsonDeserializer<ExternalNode<BigInteger, NettyConnectionInfo>> {
     @Override
     public ExternalNode<BigInteger, NettyConnectionInfo> deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-        Type type_ = new TypeToken<NettyBigIntegerExternalNode>(){}.getType();
-
         JsonObject jsonObject = jsonElement.getAsJsonObject();
-        Node<BigInteger, NettyConnectionInfo> node = jsonDeserializationContext.deserialize(jsonObject.get("node"), type_);
+        Node<BigInteger, NettyConnectionInfo> node = jsonDeserializationContext.deserialize(
+                jsonObject.get("node"),
+                new TypeToken<NettyBigIntegerExternalNode>(){}.getType()
+        );
         BigInteger distance = jsonObject.get("distance").getAsBigInteger();
         return new BigIntegerExternalNode<>(node, distance);
     }

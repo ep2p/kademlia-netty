@@ -17,10 +17,10 @@ public class NettyKademliaServerFilterChain<K extends Serializable, V extends Se
 
     public void addFilterAfter(Class<? extends NettyKademliaServerFilter<K, V>> clazz, NettyKademliaServerFilter<K, V> kademliaServerFilter){
         int indexOfClass = this.findIndexOfClass(clazz);
-        int new_index = indexOfClass + 1;
-        this.filters.add(new_index, kademliaServerFilter);
-        if (new_index != 0){
-            this.filters.get(new_index - 1).setNext(kademliaServerFilter);
+        int newIndex = indexOfClass + 1;
+        this.filters.add(newIndex, kademliaServerFilter);
+        if (newIndex != 0){
+            this.filters.get(newIndex - 1).setNext(kademliaServerFilter);
         }
     }
 

@@ -6,11 +6,11 @@ import lombok.Getter;
 
 import java.io.Serializable;
 
-public abstract class NettyServerInitializerFactory<K extends Serializable, V extends Serializable> {
+public interface NettyServerInitializerFactory<K extends Serializable, V extends Serializable> {
 
-    public abstract NettyServerInitializer<K, V> getKademliaNodeServerInitializerAPI();
+    NettyServerInitializer<K, V> getKademliaNodeServerInitializerAPI();
 
-    public static class DefaultNettyServerInitializerFactory<K extends Serializable, V extends Serializable> extends NettyServerInitializerFactory<K, V> {
+    class DefaultNettyServerInitializerFactory<K extends Serializable, V extends Serializable> implements NettyServerInitializerFactory<K, V> {
         @Getter
         protected final KademliaMessageHandlerFactory<K, V> kademliaMessageHandlerFactory;
 
@@ -19,7 +19,7 @@ public abstract class NettyServerInitializerFactory<K extends Serializable, V ex
         }
 
         public NettyServerInitializer<K, V> getKademliaNodeServerInitializerAPI(){
-            return new DefaultNettyServerInitializer<K, V>(
+            return new DefaultNettyServerInitializer<>(
                     this.kademliaMessageHandlerFactory
             );
         }
