@@ -31,7 +31,8 @@ public interface GsonFactory {
                     .registerTypeAdapter(ExternalNode.class, new ExternalNodeDeserializer())
                     .registerTypeAdapter(FindNodeAnswer.class, new FindNodeAnswerDeserializer())
                     .registerTypeAdapter(NettyBigIntegerExternalNode.class, new NodeDeserializer())
-                    .registerTypeAdapter(Node.class, new NodeSerializer());
+                    .registerTypeAdapter(Node.class, new NodeSerializer())
+                    .registerTypeAdapter(ExternalNode.class, new ExternalNodeSerializer());
         }
 
         @Override

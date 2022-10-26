@@ -3,6 +3,7 @@ package io.ep2p.kademlia.netty;
 
 import io.ep2p.kademlia.NodeSettings;
 import io.ep2p.kademlia.exception.DuplicateStoreRequest;
+import io.ep2p.kademlia.exception.UnsupportedBoundingException;
 import io.ep2p.kademlia.model.LookupAnswer;
 import io.ep2p.kademlia.model.StoreAnswer;
 import io.ep2p.kademlia.netty.builder.NettyKademliaDHTNodeBuilder;
@@ -35,7 +36,14 @@ public class DHTTest {
         NodeSettings.Default.BUCKET_SIZE = 100;
         NodeSettings.Default.PING_SCHEDULE_TIME_VALUE = 5;
 
-        KeyHashGenerator<BigInteger, String> keyHashGenerator = key -> new BoundedHashUtil(NodeSettings.Default.IDENTIFIER_SIZE).hash(key.hashCode(), BigInteger.class);
+        KeyHashGenerator<BigInteger, String> keyHashGenerator = key -> {
+            try {
+                return new BoundedHashUtil(NodeSettings.Default.IDENTIFIER_SIZE).hash(key.hashCode(), BigInteger.class);
+            } catch (UnsupportedBoundingException e) {
+                e.printStackTrace();
+            }
+            return BigInteger.valueOf(key.hashCode());
+        };
 
         nettyMessageSender1 = new NettyMessageSender<>();
         nettyMessageSender2 = new NettyMessageSender<>();

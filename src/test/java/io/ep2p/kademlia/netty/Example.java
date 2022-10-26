@@ -1,6 +1,7 @@
 package io.ep2p.kademlia.netty;
 
 import io.ep2p.kademlia.NodeSettings;
+import io.ep2p.kademlia.exception.UnsupportedBoundingException;
 import io.ep2p.kademlia.model.LookupAnswer;
 import io.ep2p.kademlia.model.StoreAnswer;
 import io.ep2p.kademlia.netty.builder.NettyKademliaDHTNodeBuilder;
@@ -28,7 +29,14 @@ public class Example {
 
         NettyMessageSender<String, String> nettyMessageSender = new NettyMessageSender<>();
 
-        KeyHashGenerator<BigInteger, String> keyHashGenerator = key ->  new BoundedHashUtil(NodeSettings.Default.IDENTIFIER_SIZE).hash(key.hashCode(), BigInteger.class);
+        KeyHashGenerator<BigInteger, String> keyHashGenerator = key -> {
+            try {
+                return new BoundedHashUtil(NodeSettings.Default.IDENTIFIER_SIZE).hash(key.hashCode(), BigInteger.class);
+            } catch (UnsupportedBoundingException e) {
+                e.printStackTrace();
+            }
+            return BigInteger.valueOf(key.hashCode());
+        };
 
 
         NettyKademliaDHTNode<String, String> node1 = new NettyKademliaDHTNodeBuilder<>(

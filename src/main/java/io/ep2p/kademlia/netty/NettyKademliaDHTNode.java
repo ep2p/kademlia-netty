@@ -10,7 +10,6 @@ import lombok.SneakyThrows;
 
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.util.Date;
 import java.util.concurrent.Future;
 
 public class NettyKademliaDHTNode<K extends Serializable, V extends Serializable>
@@ -50,15 +49,5 @@ public class NettyKademliaDHTNode<K extends Serializable, V extends Serializable
     public void stopNow(){
         super.stopNow();
         kademliaNodeServer.stop();
-    }
-
-    @Override
-    public void setLastSeen(Date date) {
-        // implementation is ignored
-    }
-
-    @Override
-    public Date getLastSeen() {
-        return new Date();
     }
 }
