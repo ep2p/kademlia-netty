@@ -152,4 +152,17 @@ Using maven:
 ```
 
 
+---
+
+## Donations
+
+Coffee has a cost :smile:
+
+Any  sort of small or large donations can be a motivation in maintaining this repository and related repositories.
+
+- **ETH**: `0x5F120228C12e2C6923AfDeb0e811d74160166d90`
+- **TRC20**: `TJjw5n26KFBqkJQbs7eKdxkVuk4pvJdFzE`
+- **BTC**: `bc1qmtewrl7srjrkl8t4z5vantuqkz086srj4clzh3`
+
+
 Cheers
