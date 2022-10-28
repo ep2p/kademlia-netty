@@ -26,8 +26,8 @@ public class NettyKademliaDHTNode<K extends Serializable, V extends Serializable
     @Override
     @SneakyThrows
     public void start() {
-        super.start();
         kademliaNodeServer.run(this);
+        super.start();
     }
 
     @Override

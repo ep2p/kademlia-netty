@@ -1,8 +1,8 @@
 package io.ep2p.kademlia.netty.server.filter;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+
 import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
+import io.ep2p.kademlia.netty.serialization.MessageSerializer;
 import io.ep2p.kademlia.protocol.message.KademliaMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -24,10 +24,10 @@ import static io.netty.handler.codec.http.HttpHeaderValues.APPLICATION_JSON;
 @Slf4j
 public class KademliaMainHandlerFilter<K extends Serializable, V extends Serializable> extends NettyKademliaServerFilter<K, V> {
 
-    private final Gson gson;
+    private final MessageSerializer messageSerializer;
 
-    public KademliaMainHandlerFilter(Gson gson) {
-        this.gson = gson;
+    public KademliaMainHandlerFilter(MessageSerializer messageSerializer) {
+        this.messageSerializer = messageSerializer;
     }
 
     @Override
@@ -46,7 +46,7 @@ public class KademliaMainHandlerFilter<K extends Serializable, V extends Seriali
         }
 
         response.content().writeBytes(
-                Unpooled.wrappedBuffer(this.gson.toJson(responseMessage).getBytes(StandardCharsets.UTF_8))
+                Unpooled.wrappedBuffer(this.messageSerializer.serialize(responseMessage).getBytes(StandardCharsets.UTF_8))
         );
 
         response.headers()
@@ -62,9 +62,8 @@ public class KademliaMainHandlerFilter<K extends Serializable, V extends Seriali
     }
 
     protected KademliaMessage<BigInteger, NettyConnectionInfo, Serializable> toKademliaMessage(String message) {
-        return this.gson.fromJson(
-                message,
-                new TypeToken<KademliaMessage<BigInteger, NettyConnectionInfo, Serializable>>(){}.getType()
+        return this.messageSerializer.deserialize(
+                message
         );
     }
 }

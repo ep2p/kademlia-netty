@@ -7,7 +7,7 @@ import io.ep2p.kademlia.exception.UnsupportedBoundingException;
 import io.ep2p.kademlia.model.LookupAnswer;
 import io.ep2p.kademlia.model.StoreAnswer;
 import io.ep2p.kademlia.netty.builder.NettyKademliaDHTNodeBuilder;
-import io.ep2p.kademlia.netty.client.NettyMessageSender;
+import io.ep2p.kademlia.netty.client.OkHttpMessageSender;
 import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
 import io.ep2p.kademlia.node.KeyHashGenerator;
 import io.ep2p.kademlia.util.BoundedHashUtil;
@@ -23,8 +23,8 @@ import java.util.concurrent.TimeUnit;
 
 public class DHTTest {
 
-    private static NettyMessageSender<String, String> nettyMessageSender1;
-    private static NettyMessageSender<String, String> nettyMessageSender2;
+    private static OkHttpMessageSender<String, String> okHttpMessageSender1;
+    private static OkHttpMessageSender<String, String> okHttpMessageSender2;
     private static NettyKademliaDHTNode<String, String> node1;
     private static NettyKademliaDHTNode<String, String> node2;
 
@@ -45,8 +45,8 @@ public class DHTTest {
             return BigInteger.valueOf(key.hashCode());
         };
 
-        nettyMessageSender1 = new NettyMessageSender<>();
-        nettyMessageSender2 = new NettyMessageSender<>();
+        okHttpMessageSender1 = new OkHttpMessageSender<>();
+        okHttpMessageSender2 = new OkHttpMessageSender<>();
 
         // node 1
         node1 = new NettyKademliaDHTNodeBuilder<>(
@@ -71,8 +71,8 @@ public class DHTTest {
 
     @AfterAll
     public static void cleanup(){
-        nettyMessageSender1.stop();
-        nettyMessageSender2.stop();
+        okHttpMessageSender1.stop();
+        okHttpMessageSender2.stop();
         node1.stop();
         node2.stop();
     }

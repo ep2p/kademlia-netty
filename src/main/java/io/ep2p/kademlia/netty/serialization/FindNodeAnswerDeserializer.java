@@ -11,11 +11,14 @@ import io.ep2p.kademlia.node.external.ExternalNode;
 
 import java.lang.reflect.Type;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class FindNodeAnswerDeserializer implements JsonDeserializer<FindNodeAnswer<BigInteger, NettyConnectionInfo>> {
     @Override
     public FindNodeAnswer<BigInteger, NettyConnectionInfo> deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+        String uuid = UUID.randomUUID().toString();
         FindNodeAnswer<BigInteger, NettyConnectionInfo> findNodeAnswer = new FindNodeAnswer<>();
         findNodeAnswer.setDestinationId(jsonElement.getAsJsonObject().get("destination_id").getAsBigInteger());
         findNodeAnswer.setNodes(jsonDeserializationContext.deserialize(

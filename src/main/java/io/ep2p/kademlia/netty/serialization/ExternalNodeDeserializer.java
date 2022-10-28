@@ -15,11 +15,12 @@ public class ExternalNodeDeserializer implements JsonDeserializer<ExternalNode<B
     @Override
     public ExternalNode<BigInteger, NettyConnectionInfo> deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject jsonObject = jsonElement.getAsJsonObject();
-        Node<BigInteger, NettyConnectionInfo> node = jsonDeserializationContext.deserialize(
-                jsonObject.get("node"),
-                new TypeToken<NettyBigIntegerExternalNode>(){}.getType()
-        );
         BigInteger distance = jsonObject.get("distance").getAsBigInteger();
+        jsonObject.remove("distance");
+        Node<BigInteger, NettyConnectionInfo> node = jsonDeserializationContext.deserialize(
+                jsonElement,
+                Node.class
+        );
         return new BigIntegerExternalNode<>(node, distance);
     }
 }

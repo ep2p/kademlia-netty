@@ -1,13 +1,13 @@
 package io.ep2p.kademlia.netty;
 
 import io.ep2p.kademlia.NodeSettings;
-import io.ep2p.kademlia.exception.DuplicateStoreRequest;
 import io.ep2p.kademlia.exception.UnsupportedBoundingException;
 import io.ep2p.kademlia.netty.builder.NettyKademliaDHTNodeBuilder;
-import io.ep2p.kademlia.netty.client.NettyMessageSender;
+import io.ep2p.kademlia.netty.client.OkHttpMessageSender;
 import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
 import io.ep2p.kademlia.netty.factory.GsonFactory;
 import io.ep2p.kademlia.netty.factory.KademliaMessageHandlerFactory;
+import io.ep2p.kademlia.netty.serialization.GsonMessageSerializer;
 import io.ep2p.kademlia.netty.server.filter.KademliaMainHandlerFilter;
 import io.ep2p.kademlia.netty.server.filter.NettyKademliaServerFilter;
 import io.ep2p.kademlia.netty.server.filter.NettyKademliaServerFilterChain;
@@ -29,7 +29,7 @@ import java.util.concurrent.TimeoutException;
 import static org.mockito.Mockito.*;
 
 public class FilterChainTest {
-    private static NettyMessageSender<String, String> nettyMessageSender1;
+    private static OkHttpMessageSender<String, String> okHttpMessageSender1;
     private static NettyKademliaDHTNode<String, String> node1;
 
     private static class EmptyFilter extends NettyKademliaServerFilter<String, String>{}
@@ -50,7 +50,7 @@ public class FilterChainTest {
             return BigInteger.valueOf(key.hashCode());
         };
 
-        nettyMessageSender1 = new NettyMessageSender<>();
+        okHttpMessageSender1 = new OkHttpMessageSender<>();
 
         // node 1
         node1 = new NettyKademliaDHTNodeBuilder<>(
@@ -65,7 +65,7 @@ public class FilterChainTest {
 
     @AfterAll
     public static void cleanup(){
-        nettyMessageSender1.stop();
+        okHttpMessageSender1.stop();
         node1.stop();
     }
 
@@ -76,7 +76,7 @@ public class FilterChainTest {
 
         NettyKademliaServerFilterChain<String, String> filterChain = new NettyKademliaServerFilterChain<>();
         filterChain.addFilter(new EmptyFilter());
-        filterChain.addFilter(new KademliaMainHandlerFilter<>(new GsonFactory.DefaultGsonFactory<>().gson()));
+        filterChain.addFilter(new KademliaMainHandlerFilter<>(new GsonMessageSerializer<>(new GsonFactory.DefaultGsonFactory<>().gsonBuilder())));
         filterChain.addFilterAfter(EmptyFilter.class, mockFilter);
 
 

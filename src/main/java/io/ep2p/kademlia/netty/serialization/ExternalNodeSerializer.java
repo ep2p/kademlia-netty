@@ -18,6 +18,7 @@ public class ExternalNodeSerializer implements JsonSerializer<ExternalNode<BigIn
         jsonNode.addProperty("id", src.getId());
         jsonNode.add("lastSeen", context.serialize(src.getLastSeen(), Date.class));
         jsonNode.add("connectionInfo", context.serialize(src.getConnectionInfo(), NettyConnectionInfo.class));
+        jsonNode.add("distance", context.serialize(src.getDistance(), BigInteger.class));
         return jsonNode;
     }
 }
