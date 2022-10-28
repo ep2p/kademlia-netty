@@ -13,7 +13,8 @@ Implementation of [kademlia API](https://github.com/ep2p/kademlia-api) DHT using
 - OKHttp (as [`RequestSender`](https://github.com/ep2p/kademlia-api#messagesender-interface) implementation)
 - Gson (as serializer/deserializer)
 
-This library uses `Long` as Node IDs to be able to cover all size of numbers.
+This library uses `Long` as Node IDs and `NettyConnectionInfo` as implementation of `ConnectionInfo` interafce.
+
 However, it is still abstract, therefore you should implement some parts that are mentioned in [kademlia API](https://github.com/ep2p/kademlia-api) such as:
 
 - [DHT Repository](https://github.com/ep2p/kademlia-api#dht)
