@@ -8,7 +8,7 @@ import io.ep2p.kademlia.protocol.message.DHTStoreResultKademliaMessage;
 import java.io.Serializable;
 import java.lang.reflect.Type;
 
-public class DHTStoreResultDeserializer<K extends Serializable> implements JsonDeserializer<DHTStoreResultKademliaMessage.DHTStoreResult<K>> {
+public class DHTStoreResultDataDataDeserializer<K extends Serializable> implements JsonDeserializer<DHTStoreResultKademliaMessage.DHTStoreResult<K>> {
 
     @Override
     public DHTStoreResultKademliaMessage.DHTStoreResult<K> deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {

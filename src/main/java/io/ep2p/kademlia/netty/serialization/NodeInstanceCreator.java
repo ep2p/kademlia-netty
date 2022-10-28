@@ -6,11 +6,11 @@ import io.ep2p.kademlia.netty.common.NettyExternalNode;
 import io.ep2p.kademlia.node.Node;
 
 import java.lang.reflect.Type;
-import java.math.BigInteger;
 
-public class NodeInstanceCreator implements InstanceCreator<Node<BigInteger, NettyConnectionInfo>> {
+
+public class NodeInstanceCreator implements InstanceCreator<Node<Long, NettyConnectionInfo>> {
     @Override
-    public Node<BigInteger, NettyConnectionInfo> createInstance(Type type) {
+    public Node<Long, NettyConnectionInfo> createInstance(Type type) {
         return new NettyExternalNode();
     }
 }

@@ -1,16 +1,16 @@
 package io.ep2p.kademlia.netty.common;
 
-import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
 import io.ep2p.kademlia.node.Node;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 
-import java.math.BigInteger;
 
 @Data
 @ToString
-public class NettyExternalNode implements Node<BigInteger, NettyConnectionInfo> {
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class NettyExternalNode implements Node<Long, NettyConnectionInfo> {
     private NettyConnectionInfo connectionInfo;
-    private BigInteger id;
+    private Long id;
 
 }

@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigInteger;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -34,15 +33,16 @@ public class DHTTest {
     public static void init() {
         NodeSettings.Default.IDENTIFIER_SIZE = 4;
         NodeSettings.Default.BUCKET_SIZE = 100;
-        NodeSettings.Default.PING_SCHEDULE_TIME_VALUE = 5;
+        NodeSettings.Default.PING_SCHEDULE_TIME_VALUE = 100;
+//        NodeSettings.Default.ENABLED_FIRST_STORE_REQUEST_FORCE_PASS = false;
 
-        KeyHashGenerator<BigInteger, String> keyHashGenerator = key -> {
+        KeyHashGenerator<Long, String> keyHashGenerator = key -> {
             try {
-                return new BoundedHashUtil(NodeSettings.Default.IDENTIFIER_SIZE).hash(key.hashCode(), BigInteger.class);
+                return (long) new BoundedHashUtil(NodeSettings.Default.IDENTIFIER_SIZE).hash(key.hashCode(), Integer.class);
             } catch (UnsupportedBoundingException e) {
                 e.printStackTrace();
             }
-            return BigInteger.valueOf(key.hashCode());
+            return (long) key.hashCode();
         };
 
         okHttpMessageSender1 = new OkHttpMessageSender<>();
@@ -50,7 +50,7 @@ public class DHTTest {
 
         // node 1
         node1 = new NettyKademliaDHTNodeBuilder<>(
-                BigInteger.valueOf(1),
+                1L,
                 new NettyConnectionInfo("127.0.0.1", NodeHelper.findRandomPort()),
                 new SampleRepository(),
                 keyHashGenerator
@@ -60,7 +60,7 @@ public class DHTTest {
 
         // node 2
         node2 = new NettyKademliaDHTNodeBuilder<>(
-                BigInteger.valueOf(2),
+                2L,
                 new NettyConnectionInfo("127.0.0.1", NodeHelper.findRandomPort()),
                 new SampleRepository(),
                 keyHashGenerator
@@ -82,13 +82,13 @@ public class DHTTest {
         String[] values = new String[]{"V", "ABC", "SOME VALUE"};
         for (String v : values){
             System.out.println("Testing DHT for K: " + v.hashCode() + " & V: " + v);
-            StoreAnswer<BigInteger, String> storeAnswer = node2.store("" + v.hashCode(), v).get();
+            StoreAnswer<Long, String> storeAnswer = node2.store("" + v.hashCode(), v).get();
             Assertions.assertEquals(StoreAnswer.Result.STORED, storeAnswer.getResult());
-
-            LookupAnswer<BigInteger, String, String> lookupAnswer = node1.lookup("" + v.hashCode()).get();
+            System.out.println(storeAnswer.getNodeId() + " stored data");
+            LookupAnswer<Long, String, String> lookupAnswer = node1.lookup("" + v.hashCode()).get();
+            System.out.println("Node " + node1.getId() + " found " + v.hashCode() + " from " + lookupAnswer.getNodeId());
             Assertions.assertEquals(LookupAnswer.Result.FOUND, lookupAnswer.getResult());
             Assertions.assertEquals(lookupAnswer.getValue(), v);
-            System.out.println("Node " + node1.getId() + " found " + v.hashCode() + " from " + lookupAnswer.getNodeId());
 
             lookupAnswer = node2.lookup("" + v.hashCode()).get();
             Assertions.assertEquals(LookupAnswer.Result.FOUND, lookupAnswer.getResult());
@@ -100,8 +100,8 @@ public class DHTTest {
 
     @Test
     void testNetworkKnowledge(){
-        Assertions.assertTrue(node1.getRoutingTable().contains(BigInteger.valueOf(2)));
-        Assertions.assertTrue(node2.getRoutingTable().contains(BigInteger.valueOf(1)));
+        Assertions.assertTrue(node1.getRoutingTable().contains(2L));
+        Assertions.assertTrue(node2.getRoutingTable().contains(1L));
     }
 
 }

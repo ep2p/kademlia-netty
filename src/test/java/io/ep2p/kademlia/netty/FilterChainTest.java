@@ -20,13 +20,12 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
 
 public class FilterChainTest {
     private static OkHttpMessageSender<String, String> okHttpMessageSender1;
@@ -41,20 +40,20 @@ public class FilterChainTest {
         NodeSettings.Default.BUCKET_SIZE = 100;
         NodeSettings.Default.PING_SCHEDULE_TIME_VALUE = 5;
 
-        KeyHashGenerator<BigInteger, String> keyHashGenerator = key -> {
+        KeyHashGenerator<Long, String> keyHashGenerator = key -> {
             try {
-                return new BoundedHashUtil(NodeSettings.Default.IDENTIFIER_SIZE).hash(key.hashCode(), BigInteger.class);
+                return new BoundedHashUtil(NodeSettings.Default.IDENTIFIER_SIZE).hash(key.hashCode(), Long.class);
             } catch (UnsupportedBoundingException e) {
                 e.printStackTrace();
             }
-            return BigInteger.valueOf(key.hashCode());
+            return Long.valueOf(key.hashCode());
         };
 
         okHttpMessageSender1 = new OkHttpMessageSender<>();
 
         // node 1
         node1 = new NettyKademliaDHTNodeBuilder<>(
-                BigInteger.valueOf(1),
+                1L,
                 new NettyConnectionInfo("127.0.0.1", NodeHelper.findRandomPort()),
                 new SampleRepository(),
                 keyHashGenerator
@@ -81,7 +80,7 @@ public class FilterChainTest {
 
 
         NettyKademliaDHTNode<String, String> node2 = new NettyKademliaDHTNodeBuilder<>(
-                BigInteger.valueOf(2),
+                2L,
                 new NettyConnectionInfo("127.0.0.1", NodeHelper.findRandomPort()),
                 new SampleRepository(),
                 node1.getKeyHashGenerator()

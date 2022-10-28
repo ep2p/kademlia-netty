@@ -8,12 +8,10 @@ import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
 import io.ep2p.kademlia.node.Node;
 
 import java.lang.reflect.Type;
-import java.math.BigInteger;
-import java.util.Date;
 
-public class NodeSerializer implements JsonSerializer<Node<BigInteger, NettyConnectionInfo>> {
+public class NodeSerializer implements JsonSerializer<Node<Long, NettyConnectionInfo>> {
     @Override
-    public JsonElement serialize(Node<BigInteger, NettyConnectionInfo> src, Type type, JsonSerializationContext context) {
+    public JsonElement serialize(Node<Long, NettyConnectionInfo> src, Type type, JsonSerializationContext context) {
         JsonObject jsonNode = new JsonObject();
         jsonNode.addProperty("id", src.getId());
         jsonNode.add("connectionInfo", context.serialize(src.getConnectionInfo(), NettyConnectionInfo.class));

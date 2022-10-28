@@ -4,7 +4,6 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.ep2p.kademlia.model.FindNodeAnswer;
-import io.ep2p.kademlia.netty.common.NettyBigIntegerExternalNode;
 import io.ep2p.kademlia.netty.serialization.*;
 import io.ep2p.kademlia.node.Node;
 import io.ep2p.kademlia.node.external.ExternalNode;
@@ -27,10 +26,10 @@ public interface GsonFactory {
                     .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
 
                     .registerTypeAdapter(KademliaMessage.class, new KademliaMessageDeserializer<K, V>())
-                    .registerTypeAdapter(DHTLookupKademliaMessage.DHTLookup.class, new DHTLookUpDeserializer<K>())
+                    .registerTypeAdapter(DHTLookupKademliaMessage.DHTLookup.class, new DHTLookUpDataDeserializer<K>())
                     .registerTypeAdapter(DHTLookupResultKademliaMessage.DHTLookupResult.class, new DHTLookUpResultDeserializer<K, V>())
-                    .registerTypeAdapter(DHTStoreKademliaMessage.DHTData.class, new DHTStoreDeserializer<K, V>())
-                    .registerTypeAdapter(DHTStoreResultKademliaMessage.DHTStoreResult.class, new DHTStoreResultDeserializer<K>())
+                    .registerTypeAdapter(DHTStoreKademliaMessage.DHTData.class, new DHTStoreDataDeserializer<K, V>())
+                    .registerTypeAdapter(DHTStoreResultKademliaMessage.DHTStoreResult.class, new DHTStoreResultDataDataDeserializer<K>())
                     .registerTypeAdapter(ExternalNode.class, new ExternalNodeDeserializer())
                     .registerTypeAdapter(FindNodeAnswer.class, new FindNodeAnswerDeserializer())
 //                    .registerTypeAdapter(Node.class, new NodeInstanceCreator())

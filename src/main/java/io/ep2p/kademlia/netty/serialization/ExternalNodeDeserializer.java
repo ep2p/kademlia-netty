@@ -1,26 +1,32 @@
 package io.ep2p.kademlia.netty.serialization;
 
 import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
-import io.ep2p.kademlia.netty.common.NettyBigIntegerExternalNode;
 import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
 import io.ep2p.kademlia.node.Node;
-import io.ep2p.kademlia.node.external.BigIntegerExternalNode;
 import io.ep2p.kademlia.node.external.ExternalNode;
+import io.ep2p.kademlia.node.external.LongExternalNode;
 
 import java.lang.reflect.Type;
-import java.math.BigInteger;
 
-public class ExternalNodeDeserializer implements JsonDeserializer<ExternalNode<BigInteger, NettyConnectionInfo>> {
+
+public class ExternalNodeDeserializer implements JsonDeserializer<ExternalNode<Long, NettyConnectionInfo>> {
     @Override
-    public ExternalNode<BigInteger, NettyConnectionInfo> deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+    public ExternalNode<Long, NettyConnectionInfo> deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject jsonObject = jsonElement.getAsJsonObject();
-        BigInteger distance = jsonObject.get("distance").getAsBigInteger();
+        Long distance = jsonObject.get("distance").getAsLong();
         jsonObject.remove("distance");
-        Node<BigInteger, NettyConnectionInfo> node = jsonDeserializationContext.deserialize(
-                jsonElement,
-                Node.class
-        );
-        return new BigIntegerExternalNode<>(node, distance);
+        Node<Long, NettyConnectionInfo> node = null;
+        if (jsonObject.has("node")){
+            node = jsonDeserializationContext.deserialize(
+                    jsonObject.get("node"),
+                    Node.class
+            );
+        }else {
+            node = jsonDeserializationContext.deserialize(
+                    jsonObject,
+                    Node.class
+            );
+        }
+        return new LongExternalNode<>(node, distance);
     }
 }

@@ -15,7 +15,6 @@ import io.ep2p.kademlia.table.DefaultRoutingTableFactory;
 import io.ep2p.kademlia.table.RoutingTableFactory;
 
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +42,7 @@ public class NettyKademliaDHTNodeDefaults {
 
         pipelines.add(builder -> {
             if (builder.getRoutingTable() == null) {
-                RoutingTableFactory<BigInteger, NettyConnectionInfo, Bucket<BigInteger, NettyConnectionInfo>> routingTableFactory = new DefaultRoutingTableFactory<>(builder.getNodeSettings());
+                RoutingTableFactory<Long, NettyConnectionInfo, Bucket<Long, NettyConnectionInfo>> routingTableFactory = new DefaultRoutingTableFactory<>(builder.getNodeSettings());
                 builder.routingTable(routingTableFactory.getRoutingTable(builder.getId()));
             }
         });
