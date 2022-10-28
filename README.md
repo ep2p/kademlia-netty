@@ -148,7 +148,7 @@ Using maven:
 <dependency>
     <groupId>io.ep2p</groupId>
     <artifactId>kademlia-netty</artifactId>
-    <version>0.1.3-RELEASE</version>
+    <version>0.1.6-RELEASE</version>
 </dependency>
 ```
 
