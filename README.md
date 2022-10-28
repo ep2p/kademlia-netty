@@ -13,7 +13,7 @@ Implementation of [kademlia API](https://github.com/ep2p/kademlia-api) DHT using
 - OKHttp (as [`RequestSender`](https://github.com/ep2p/kademlia-api#messagesender-interface) implementation)
 - Gson (as serializer/deserializer)
 
-This library uses `BigInteger` as Node IDs to be able to cover all size of numbers.
+This library uses `Long` as Node IDs to be able to cover all size of numbers.
 However, it is still abstract, therefore you should implement some parts that are mentioned in [kademlia API](https://github.com/ep2p/kademlia-api) such as:
 
 - [DHT Repository](https://github.com/ep2p/kademlia-api#dht)
@@ -43,11 +43,11 @@ First lets get some things ready:
 
 // Implement your KeyHashGenerator. here is a basic one:
 
-KeyHashGenerator<BigInteger, String> keyHashGenerator = new KeyHashGenerator<BigInteger, String>() {
+KeyHashGenerator<Long, String> keyHashGenerator = new KeyHashGenerator<Long, String>() {
     @Override
-    public BigInteger generateHash(String key) {
+    public Long generateHash(String key) {
         //io.ep2p.kademlia.util.BoundedHashUtil
-        return new BoundedHashUtil(NodeSettings.Default.IDENTIFIER_SIZE).hash(key.hashCode(), BigInteger.class);
+        return new BoundedHashUtil(NodeSettings.Default.IDENTIFIER_SIZE).hash(key.hashCode(), Long.class);
     }
 };
 
@@ -88,7 +88,7 @@ Now that we have our DHT repository ready, it's time to create a basic node. Let
 // run our node on 127.0.0.1 : 8000
 
 NettyKadmliaDHTNode<String, String> node1 = new NettyKademliaDHTNodeBuilder<String, String>(
-            BigInteger.valueOf(1),
+            1L,
             new NettyConnectionInfo("127.0.0.1", 8000),
             repository,
             keyHashGenerator
@@ -109,7 +109,7 @@ NettyKadmliaDHTNode<String, String> node2 = ...;
 // instead of running it, bootstrap it with first node like:
 
 // use information from node 1 to bootstrap node 2
-Node<BigInteger, NettyConnectionInfo> bootstrapNode = new NettyBigIntegerExternalNode(new NettyConnectionInfo("127.0.0.1", 8000), BigInteger.valueOf(1), new Date());
+Node<Long, NettyConnectionInfo> bootstrapNode = new NettyLongExternalNode(new NettyConnectionInfo("127.0.0.1", 8000), 1L, new Date());
 node2.start(bootstrapNode)
 
 ```
@@ -117,11 +117,11 @@ node2.start(bootstrapNode)
 Now it's time to test DHT:
 
 ```java
-StoreAnswer<BigInteger, String> storeAnswer = node2.store("Key", "Your Value Here").get();
+StoreAnswer<Long, String> storeAnswer = node2.store("Key", "Your Value Here").get();
 System.out.println(storeAnswer.getResult());
 System.out.println(storeAnswer.getNodeId());
 
-LookupAnswer<BigInteger, String, String> k = node1.lookup("K").get();
+LookupAnswer<Long, String, String> k = node1.lookup("K").get();
 System.out.println(k.getResult());
 System.out.println(k.getValue());
 ```
