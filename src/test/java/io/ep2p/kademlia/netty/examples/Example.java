@@ -1,11 +1,12 @@
-package io.ep2p.kademlia.netty;
+package io.ep2p.kademlia.netty.examples;
 
 import io.ep2p.kademlia.NodeSettings;
 import io.ep2p.kademlia.exception.UnsupportedBoundingException;
 import io.ep2p.kademlia.model.LookupAnswer;
 import io.ep2p.kademlia.model.StoreAnswer;
+import io.ep2p.kademlia.netty.NettyKademliaDHTNode;
+import io.ep2p.kademlia.netty.SampleRepository;
 import io.ep2p.kademlia.netty.builder.NettyKademliaDHTNodeBuilder;
-import io.ep2p.kademlia.netty.client.OkHttpMessageSender;
 import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
 import io.ep2p.kademlia.node.KeyHashGenerator;
 import io.ep2p.kademlia.util.BoundedHashUtil;
@@ -21,8 +22,6 @@ public class Example {
         NodeSettings.Default.IDENTIFIER_SIZE = 4;
         NodeSettings.Default.BUCKET_SIZE = 100;
         NodeSettings.Default.PING_SCHEDULE_TIME_VALUE = 5;
-
-        OkHttpMessageSender<String, String> okHttpMessageSender = new OkHttpMessageSender<>();
 
         KeyHashGenerator<BigInteger, String> keyHashGenerator = key -> {
             try {
@@ -63,7 +62,6 @@ public class Example {
 
         node1.stopNow();
         node2.stopNow();
-        okHttpMessageSender.stop();
 
         System.exit(0);
     }
