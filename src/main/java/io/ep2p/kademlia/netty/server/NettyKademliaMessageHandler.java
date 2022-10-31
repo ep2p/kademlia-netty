@@ -15,6 +15,7 @@ import io.netty.handler.codec.http.FullHttpResponse;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.List;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
@@ -23,9 +24,9 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 @Slf4j
 public class NettyKademliaMessageHandler<K extends Serializable, V extends Serializable> extends SimpleChannelInboundHandler<FullHttpRequest> {
     private final NettyKademliaServerFilterChain<K, V> filterChain;
-    private final DHTKademliaNodeAPI<Long, NettyConnectionInfo, K, V> dhtKademliaNodeAPI;
+    private final DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI;
 
-    public NettyKademliaMessageHandler(DHTKademliaNodeAPI<Long, NettyConnectionInfo, K, V> dhtKademliaNodeAPI, NettyKademliaServerFilterChain<K, V> filterChain) {
+    public NettyKademliaMessageHandler(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI, NettyKademliaServerFilterChain<K, V> filterChain) {
         this.filterChain = filterChain;
         this.dhtKademliaNodeAPI = dhtKademliaNodeAPI;
     }

@@ -9,15 +9,16 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.concurrent.Future;
 
 public class NettyKademliaDHTNode<K extends Serializable, V extends Serializable>
-        extends DHTKademliaNodeAPIDecorator<Long, NettyConnectionInfo, K, V> {
+        extends DHTKademliaNodeAPIDecorator<BigInteger, NettyConnectionInfo, K, V> {
 
     @Getter
     private final transient KademliaNodeServer<K, V> kademliaNodeServer;
 
-    public NettyKademliaDHTNode(DHTKademliaNodeAPI<Long, NettyConnectionInfo, K, V> kademliaNode, KademliaNodeServer<K, V> kademliaNodeServer) {
+    public NettyKademliaDHTNode(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> kademliaNode, KademliaNodeServer<K, V> kademliaNodeServer) {
         super(kademliaNode);
         this.kademliaNodeServer = kademliaNodeServer;
     }
@@ -31,7 +32,7 @@ public class NettyKademliaDHTNode<K extends Serializable, V extends Serializable
 
     @Override
     @SneakyThrows
-    public Future<Boolean> start(Node<Long, NettyConnectionInfo> bootstrapNode) {
+    public Future<Boolean> start(Node<BigInteger, NettyConnectionInfo> bootstrapNode) {
         kademliaNodeServer.run(this);
         return super.start(bootstrapNode);
     }

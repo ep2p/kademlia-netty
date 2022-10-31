@@ -15,7 +15,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
-
+import java.math.BigInteger;
 
 
 @Getter
@@ -41,7 +41,7 @@ public class KademliaNodeServer<K extends Serializable, V extends Serializable> 
         this(null, port, factory);
     }
 
-    public synchronized void run(DHTKademliaNodeAPI<Long, NettyConnectionInfo, K, V> dhtKademliaNodeAPI) throws InterruptedException {
+    public synchronized void run(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI) throws InterruptedException {
         assert !running;
 
         this.bossGroup = new NioEventLoopGroup();

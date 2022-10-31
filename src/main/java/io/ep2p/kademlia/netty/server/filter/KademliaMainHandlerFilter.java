@@ -12,6 +12,7 @@ import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_LENGTH;
@@ -31,10 +32,10 @@ public class KademliaMainHandlerFilter<K extends Serializable, V extends Seriali
 
     @Override
     public void filter(Context<K, V> context, FullHttpRequest request, FullHttpResponse response) {
-        KademliaMessage<Long, NettyConnectionInfo, ? extends Serializable> responseMessage = null;
+        KademliaMessage<BigInteger, NettyConnectionInfo, ? extends Serializable> responseMessage = null;
 
         try {
-            KademliaMessage<Long, NettyConnectionInfo, Serializable> kademliaMessage = this.toKademliaMessage(
+            KademliaMessage<BigInteger, NettyConnectionInfo, Serializable> kademliaMessage = this.toKademliaMessage(
                     this.parseJsonRequest(request)
             );
             responseMessage = context.getDhtKademliaNodeApi().onMessage(kademliaMessage);
@@ -60,7 +61,7 @@ public class KademliaMainHandlerFilter<K extends Serializable, V extends Seriali
         return jsonBuf.toString(CharsetUtil.UTF_8);
     }
 
-    protected KademliaMessage<Long, NettyConnectionInfo, Serializable> toKademliaMessage(String message) {
+    protected KademliaMessage<BigInteger, NettyConnectionInfo, Serializable> toKademliaMessage(String message) {
         return this.messageSerializer.deserialize(
                 message
         );

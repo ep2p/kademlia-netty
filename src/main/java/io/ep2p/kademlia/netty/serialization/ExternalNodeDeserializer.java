@@ -4,18 +4,19 @@ import com.google.gson.*;
 import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
 import io.ep2p.kademlia.node.Node;
 import io.ep2p.kademlia.node.external.ExternalNode;
-import io.ep2p.kademlia.node.external.LongExternalNode;
+import io.ep2p.kademlia.node.external.BigIntegerExternalNode;
 
 import java.lang.reflect.Type;
+import java.math.BigInteger;
 
 
-public class ExternalNodeDeserializer implements JsonDeserializer<ExternalNode<Long, NettyConnectionInfo>> {
+public class ExternalNodeDeserializer implements JsonDeserializer<ExternalNode<BigInteger, NettyConnectionInfo>> {
     @Override
-    public ExternalNode<Long, NettyConnectionInfo> deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+    public ExternalNode<BigInteger, NettyConnectionInfo> deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject jsonObject = jsonElement.getAsJsonObject();
-        Long distance = jsonObject.get("distance").getAsLong();
+        BigInteger distance = jsonObject.get("distance").getAsBigInteger();
         jsonObject.remove("distance");
-        Node<Long, NettyConnectionInfo> node = null;
+        Node<BigInteger, NettyConnectionInfo> node = null;
         if (jsonObject.has("node")){
             node = jsonDeserializationContext.deserialize(
                     jsonObject.get("node"),
@@ -27,6 +28,6 @@ public class ExternalNodeDeserializer implements JsonDeserializer<ExternalNode<L
                     Node.class
             );
         }
-        return new LongExternalNode<>(node, distance);
+        return new BigIntegerExternalNode<>(node, distance);
     }
 }

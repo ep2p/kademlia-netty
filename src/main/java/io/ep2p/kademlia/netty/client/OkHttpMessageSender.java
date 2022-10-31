@@ -13,6 +13,7 @@ import okhttp3.*;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.net.SocketTimeoutException;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
@@ -21,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 
 @Slf4j
-public class OkHttpMessageSender<K extends Serializable, V extends Serializable> implements MessageSender<Long, NettyConnectionInfo> {
+public class OkHttpMessageSender<K extends Serializable, V extends Serializable> implements MessageSender<BigInteger, NettyConnectionInfo> {
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
     private final MessageSerializer messageSerializer;
     private final OkHttpClient client;
@@ -50,7 +51,7 @@ public class OkHttpMessageSender<K extends Serializable, V extends Serializable>
     }
 
     @Override
-    public synchronized  <I extends Serializable, O extends Serializable> KademliaMessage<Long, NettyConnectionInfo, I> sendMessage(KademliaNodeAPI<Long, NettyConnectionInfo> caller, Node<Long, NettyConnectionInfo> receiver, KademliaMessage<Long, NettyConnectionInfo, O> message) {
+    public synchronized  <I extends Serializable, O extends Serializable> KademliaMessage<BigInteger, NettyConnectionInfo, I> sendMessage(KademliaNodeAPI<BigInteger, NettyConnectionInfo> caller, Node<BigInteger, NettyConnectionInfo> receiver, KademliaMessage<BigInteger, NettyConnectionInfo, O> message) {
         message.setNode(caller);
         String messageStr = messageSerializer.serialize(message);
         RequestBody body = RequestBody.create(messageStr, JSON);
@@ -64,7 +65,7 @@ public class OkHttpMessageSender<K extends Serializable, V extends Serializable>
             return messageSerializer.deserialize(responseStr);
         } catch (IOException e) {
             log.error("Failed to send message to " + caller.getId(), e);
-            return new KademliaMessage<Long, NettyConnectionInfo, I>() {
+            return new KademliaMessage<BigInteger, NettyConnectionInfo, I>() {
                 @Override
                 public I getData() {
                     return null;
@@ -76,7 +77,7 @@ public class OkHttpMessageSender<K extends Serializable, V extends Serializable>
                 }
 
                 @Override
-                public Node<Long, NettyConnectionInfo> getNode() {
+                public Node<BigInteger, NettyConnectionInfo> getNode() {
                     return receiver;
                 }
 
@@ -89,7 +90,7 @@ public class OkHttpMessageSender<K extends Serializable, V extends Serializable>
     }
 
     @Override
-    public <O extends Serializable> void sendAsyncMessage(KademliaNodeAPI<Long, NettyConnectionInfo> caller, Node<Long, NettyConnectionInfo> receiver, KademliaMessage<Long, NettyConnectionInfo, O> message) {
+    public <O extends Serializable> void sendAsyncMessage(KademliaNodeAPI<BigInteger, NettyConnectionInfo> caller, Node<BigInteger, NettyConnectionInfo> receiver, KademliaMessage<BigInteger, NettyConnectionInfo, O> message) {
         executorService.submit(() -> sendMessage(caller, receiver, message));
     }
 

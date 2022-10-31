@@ -17,39 +17,40 @@ import io.ep2p.kademlia.table.RoutingTable;
 import lombok.Getter;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
 
 @Getter
 public class NettyKademliaDHTNodeBuilder<K extends Serializable, V extends Serializable> {
-    private final Long id;
+    private final BigInteger id;
     private final NettyConnectionInfo connectionInfo;
-    private RoutingTable<Long, NettyConnectionInfo, Bucket<Long, NettyConnectionInfo>> routingTable;
-    private MessageSender<Long, NettyConnectionInfo> messageSender;
+    private RoutingTable<BigInteger, NettyConnectionInfo, Bucket<BigInteger, NettyConnectionInfo>> routingTable;
+    private MessageSender<BigInteger, NettyConnectionInfo> messageSender;
     private NodeSettings nodeSettings;
     private GsonFactory gsonFactory;
     private final KademliaRepository<K, V> repository;
-    private final KeyHashGenerator<Long, K> keyHashGenerator;
+    private final KeyHashGenerator<BigInteger, K> keyHashGenerator;
     private KademliaNodeServer<K, V> kademliaNodeServer;
     private KademliaMessageHandlerFactory<K, V> kademliaMessageHandlerFactory;
     private NettyServerInitializerFactory<K, V> nettyServerInitializerFactory;
 
     protected List<String> required = new ArrayList<>();
 
-    public NettyKademliaDHTNodeBuilder(Long id, NettyConnectionInfo connectionInfo, KademliaRepository<K, V> repository, KeyHashGenerator<Long, K> keyHashGenerator) {
+    public NettyKademliaDHTNodeBuilder(BigInteger id, NettyConnectionInfo connectionInfo, KademliaRepository<K, V> repository, KeyHashGenerator<BigInteger, K> keyHashGenerator) {
         this.id = id;
         this.connectionInfo = connectionInfo;
         this.repository = repository;
         this.keyHashGenerator = keyHashGenerator;
     }
 
-    public NettyKademliaDHTNodeBuilder<K, V> routingTable(RoutingTable<Long, NettyConnectionInfo, Bucket<Long, NettyConnectionInfo>> routingTable){
+    public NettyKademliaDHTNodeBuilder<K, V> routingTable(RoutingTable<BigInteger, NettyConnectionInfo, Bucket<BigInteger, NettyConnectionInfo>> routingTable){
         this.routingTable = routingTable;
         return this;
     }
 
-    public NettyKademliaDHTNodeBuilder<K, V> messageSender(MessageSender<Long, NettyConnectionInfo> messageSender){
+    public NettyKademliaDHTNodeBuilder<K, V> messageSender(MessageSender<BigInteger, NettyConnectionInfo> messageSender){
         this.messageSender = messageSender;
         return this;
     }
@@ -82,7 +83,7 @@ public class NettyKademliaDHTNodeBuilder<K extends Serializable, V extends Seria
     public NettyKademliaDHTNode<K, V> build(){
         fillDefaults();
 
-        DHTKademliaNodeAPI<Long, NettyConnectionInfo, K, V> kademliaNode = new DHTKademliaNode<>(
+        DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> kademliaNode = new DHTKademliaNode<>(
                 this.id,
                 this.connectionInfo,
                 this.routingTable,

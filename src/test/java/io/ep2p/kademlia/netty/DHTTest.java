@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigInteger;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -36,13 +37,13 @@ public class DHTTest {
         NodeSettings.Default.PING_SCHEDULE_TIME_VALUE = 100;
 //        NodeSettings.Default.ENABLED_FIRST_STORE_REQUEST_FORCE_PASS = false;
 
-        KeyHashGenerator<Long, String> keyHashGenerator = key -> {
+        KeyHashGenerator<BigInteger, String> keyHashGenerator = key -> {
             try {
-                return (long) new BoundedHashUtil(NodeSettings.Default.IDENTIFIER_SIZE).hash(key.hashCode(), Integer.class);
+                return new BoundedHashUtil(NodeSettings.Default.IDENTIFIER_SIZE).hash(key.hashCode(), BigInteger.class);
             } catch (UnsupportedBoundingException e) {
                 e.printStackTrace();
             }
-            return (long) key.hashCode();
+            return BigInteger.valueOf(key.hashCode());
         };
 
         okHttpMessageSender1 = new OkHttpMessageSender<>();
@@ -50,7 +51,7 @@ public class DHTTest {
 
         // node 1
         node1 = new NettyKademliaDHTNodeBuilder<>(
-                1L,
+                BigInteger.valueOf(1L),
                 new NettyConnectionInfo("127.0.0.1", NodeHelper.findRandomPort()),
                 new SampleRepository(),
                 keyHashGenerator
@@ -60,7 +61,7 @@ public class DHTTest {
 
         // node 2
         node2 = new NettyKademliaDHTNodeBuilder<>(
-                2L,
+                BigInteger.valueOf(2L),
                 new NettyConnectionInfo("127.0.0.1", NodeHelper.findRandomPort()),
                 new SampleRepository(),
                 keyHashGenerator
@@ -82,10 +83,10 @@ public class DHTTest {
         String[] values = new String[]{"V", "ABC", "SOME VALUE"};
         for (String v : values){
             System.out.println("Testing DHT for K: " + v.hashCode() + " & V: " + v);
-            StoreAnswer<Long, String> storeAnswer = node2.store("" + v.hashCode(), v).get();
+            StoreAnswer<BigInteger, String> storeAnswer = node2.store("" + v.hashCode(), v).get();
             Assertions.assertEquals(StoreAnswer.Result.STORED, storeAnswer.getResult());
             System.out.println(storeAnswer.getNodeId() + " stored data");
-            LookupAnswer<Long, String, String> lookupAnswer = node1.lookup("" + v.hashCode()).get();
+            LookupAnswer<BigInteger, String, String> lookupAnswer = node1.lookup("" + v.hashCode()).get();
             System.out.println("Node " + node1.getId() + " found " + v.hashCode() + " from " + lookupAnswer.getNodeId());
             Assertions.assertEquals(LookupAnswer.Result.FOUND, lookupAnswer.getResult());
             Assertions.assertEquals(lookupAnswer.getValue(), v);
@@ -100,8 +101,8 @@ public class DHTTest {
 
     @Test
     void testNetworkKnowledge(){
-        Assertions.assertTrue(node1.getRoutingTable().contains(2L));
-        Assertions.assertTrue(node2.getRoutingTable().contains(1L));
+        Assertions.assertTrue(node1.getRoutingTable().contains(BigInteger.valueOf(2L)));
+        Assertions.assertTrue(node2.getRoutingTable().contains(BigInteger.valueOf(1L)));
     }
 
 }

@@ -8,13 +8,14 @@ import io.ep2p.kademlia.protocol.message.DHTStoreKademliaMessage;
 
 import java.io.Serializable;
 import java.lang.reflect.Type;
+import java.math.BigInteger;
 
 
-public class DHTStoreDataDeserializer<K extends Serializable, V extends Serializable> implements JsonDeserializer<DHTStoreKademliaMessage.DHTData<Long, NettyConnectionInfo, K, V>> {
+public class DHTStoreDataDeserializer<K extends Serializable, V extends Serializable> implements JsonDeserializer<DHTStoreKademliaMessage.DHTData<BigInteger, NettyConnectionInfo, K, V>> {
 
     @Override
-    public DHTStoreKademliaMessage.DHTData<Long, NettyConnectionInfo, K, V> deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-        DHTStoreKademliaMessage.DHTData<Long, NettyConnectionInfo, K, V> dhtData = new DHTStoreKademliaMessage.DHTData<>();
+    public DHTStoreKademliaMessage.DHTData<BigInteger, NettyConnectionInfo, K, V> deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+        DHTStoreKademliaMessage.DHTData<BigInteger, NettyConnectionInfo, K, V> dhtData = new DHTStoreKademliaMessage.DHTData<>();
         JsonObject jsonObject = jsonElement.getAsJsonObject();
         dhtData.setKey(jsonDeserializationContext.deserialize(jsonObject.get("key"), new TypeToken<K>() {}.getType()));
         dhtData.setValue(jsonDeserializationContext.deserialize(jsonObject.get("value"), new TypeToken<V>() {}.getType()));
