@@ -46,9 +46,7 @@ public class CustomDTOSerialization {
                 new PersonRepository(),
                 keyHashGenerator
         ).build();
-        node2.start(node1);
-
-        Thread.sleep(2000);
+        node2.start(node1).get();
 
 
         StoreAnswer<BigInteger, String> storeAnswer = node2.store("K", new PersonDTO("John", "Smith")).get();
