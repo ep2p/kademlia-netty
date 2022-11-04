@@ -5,7 +5,7 @@
 
 # kademlia netty
 
-**This Project is still under development** 
+**This Project is still under maintenance** 
 
 Implementation of [kademlia API](https://github.com/ep2p/kademlia-api) DHT using:
 
@@ -30,113 +30,14 @@ However, it is still abstract, therefore you should implement some parts that ar
 
 ## Examples
 
-In this section you can see some examples on how to use this library just to test it.
+There are few working examples in tests directory.
 
-### Basic
+[Main example](https://github.com/ep2p/kademlia-netty/blob/main/src/test/java/io/ep2p/kademlia/netty/examples/Example.java) 
+has everything for you to start understanding how this library works. It creates 2 nodes and stores data in DHT.
 
-If you are not fan of making many changes, here is a place to start. Let's set up a very basic node.
+[Custom DTO Example](https://github.com/ep2p/kademlia-netty/blob/main/src/test/java/io/ep2p/kademlia/netty/examples/CustomDTOSerialization.java)
+is on top of previous example, but this time we are serializing and storing a different DTO object called `Person` instead of a simple String.
 
-
-First lets get some things ready:
-
-```java
-
-
-// Implement your KeyHashGenerator. here is a basic one:
-
-KeyHashGenerator<Long, String> keyHashGenerator = new KeyHashGenerator<Long, String>() {
-    @Override
-    public Long generateHash(String key) {
-        //io.ep2p.kademlia.util.BoundedHashUtil
-        return new BoundedHashUtil(NodeSettings.Default.IDENTIFIER_SIZE).hash(key.hashCode(), Long.class);
-    }
-};
-
-
-// Implement your DHT repository
-
-KademliaRepository<String, String> repository = new KademliaRepository<String, String>() {
-    private final Map<String, String> data = new HashMap<>();
-
-    @Override
-    public void store(String key, String value) {
-        data.putIfAbsent(key, value);
-    }
-
-    @Override
-    public String get(String key) {
-        return data.get(key);
-    }
-
-    @Override
-    public void remove(String key) {
-        data.remove(key);
-    }
-
-    @Override
-    public boolean contains(String key) {
-        return data.containsKey(key);
-    }
-};
-
-```
-
-
-Now that we have our DHT repository ready, it's time to create a basic node. Lets run it on `127.0.0.1:8000`
-
-```java
-
-// run our node on 127.0.0.1 : 8000
-
-NettyKadmliaDHTNode<String, String> node1 = new NettyKademliaDHTNodeBuilder<String, String>(
-            BigInteger.valueOf(1L),
-            new NettyConnectionInfo("127.0.0.1", 8000),
-            repository,
-            keyHashGenerator
-        ).build();
-
-
-// we can start our node right now:
-
-node1.start()
-```
-
-Let's run a separate node on a different machine/port. We assume it's running on `127.0.0.1:8001`.
-
-```java
-
-NettyKadmliaDHTNode<String, String> node2 = ...;
-
-// instead of running it, bootstrap it with first node like:
-
-// use information from node 1 to bootstrap node 2
-Node<Long, NettyConnectionInfo> bootstrapNode = new NettyLongExternalNode(new NettyConnectionInfo("127.0.0.1", 8000), BigInteger.valueOf(1L), new Date());
-node2.start(bootstrapNode)
-
-```
-
-Now it's time to test DHT:
-
-```java
-StoreAnswer<BigInteger, String> storeAnswer = node2.store("Key", "Your Value Here").get();
-System.out.println(storeAnswer.getResult());
-System.out.println(storeAnswer.getNodeId());
-
-LookupAnswer<BigInteger, String, String> k = node1.lookup("K").get();
-System.out.println(k.getResult());
-System.out.println(k.getValue());
-```
-
-Depending on the actual `Key`, `Value` and `NodeID`s, data will be persisted on different nodes.
-
-We can now shutdown our nodes
-```
-// gracefully:
-node1.stop()
-
-//or
-node1.stopNow()
-```
 
 ---
 
@@ -148,7 +49,7 @@ Using maven:
 <dependency>
     <groupId>io.ep2p</groupId>
     <artifactId>kademlia-netty</artifactId>
-    <version>0.1.7-RELEASE</version>
+    <version>0.1.8-RELEASE</version>
 </dependency>
 ```
 

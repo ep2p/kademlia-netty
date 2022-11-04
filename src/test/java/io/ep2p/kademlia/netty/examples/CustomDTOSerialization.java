@@ -59,6 +59,8 @@ public class CustomDTOSerialization {
 
         node1.stopNow();
         node2.stopNow();
+
+        System.exit(0);
     }
 
 }
