@@ -1,25 +1,26 @@
-package io.ep2p.kademlia.netty.examples;
+package io.ep2p.kademlia.netty;
 
 import io.ep2p.kademlia.NodeSettings;
 import io.ep2p.kademlia.exception.UnsupportedBoundingException;
 import io.ep2p.kademlia.model.LookupAnswer;
 import io.ep2p.kademlia.model.StoreAnswer;
-import io.ep2p.kademlia.netty.NettyKademliaDHTNode;
-import io.ep2p.kademlia.netty.SampleRepository;
 import io.ep2p.kademlia.netty.builder.NettyKademliaDHTNodeBuilder;
 import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
 import io.ep2p.kademlia.node.KeyHashGenerator;
 import io.ep2p.kademlia.util.BoundedHashUtil;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
 
-public class Example {
+public class DHTNodeShutdownTest {
 
     @SneakyThrows
-    public static void main(String[] args) {
+    @Test
+    public void testFailLookupAfterShutdown() {
         // Setting NodeSettings
-        NodeSettings.Default.IDENTIFIER_SIZE = 4;
+        NodeSettings.Default.IDENTIFIER_SIZE = 3;
         NodeSettings.Default.BUCKET_SIZE = 100;   // K=100 for k-buckets
         NodeSettings.Default.PING_SCHEDULE_TIME_VALUE = 5;  // Ping every 5 seconds (doesn't matter in our case)
 
@@ -44,36 +45,33 @@ public class Example {
         ).build();
         node1.start();
 
-
-        // Starting node 2 - bootstrapping with node 1
-        NettyKademliaDHTNode< String, String> node2 = new NettyKademliaDHTNodeBuilder<>(
+        NettyKademliaDHTNode<String, String> node2 = new NettyKademliaDHTNodeBuilder<>(
                 BigInteger.valueOf(2L),
                 new NettyConnectionInfo("127.0.0.1", 8001),
                 new SampleRepository(),
                 keyHashGenerator
         ).build();
-        node2.start(node1).get();  // Wait till bootstrap future finishes
+        node2.start(node1).get();
 
+        Thread.sleep(2000);
+        StoreAnswer<BigInteger, String> storeAnswer = node1.store("1", "1").get();
+        Assertions.assertEquals(StoreAnswer.Result.STORED, storeAnswer.getResult());
 
-        // Store a value in DHT through node 1 (in this case, a key with name "K" will definitely get stored in node 2)
-        StoreAnswer<BigInteger, String> storeAnswer = node2.store("K", "V").get();
-        System.out.printf("Store result: %s - Node: %s%n", storeAnswer.getResult(), storeAnswer.getNodeId());
-        System.out.printf("Data in node 2: %s%n", node2.getKademliaRepository().get("K"));
+        LookupAnswer<BigInteger, String, String> lookupAnswer = node1.lookup("1").get();
+        System.out.printf("A Lookup result: %s - Value: %s%n", lookupAnswer.getResult(), lookupAnswer.getValue());
+        Assertions.assertEquals(LookupAnswer.Result.FOUND, lookupAnswer.getResult());
 
-        // Retrieve the value of key "K" through node 1
-        LookupAnswer<BigInteger, String, String> lookupAnswer = node1.lookup("K").get();
-        System.out.printf("Lookup result: %s - Value: %s%n", lookupAnswer.getResult(), lookupAnswer.getValue());
+        lookupAnswer = node2.lookup("1").get();
+        System.out.printf("B Lookup result: %s - Value: %s%n", lookupAnswer.getResult(), lookupAnswer.getValue());
+        Assertions.assertEquals(LookupAnswer.Result.FOUND, lookupAnswer.getResult());
 
-        for (int i = 0; i < 100; i++){
-            System.out.println("Looking up");
-            lookupAnswer = node2.lookup("1").get();
-            System.out.printf("Lookup result: %s - Value: %s%n", lookupAnswer.getResult(), lookupAnswer.getValue());
-            Thread.sleep(500);
-        }
         node1.stopNow();
+
+        lookupAnswer = node2.lookup("1").get();
+        Assertions.assertEquals(LookupAnswer.Result.FAILED, lookupAnswer.getResult());
+
         node2.stopNow();
 
-        System.exit(0);
     }
 
 }

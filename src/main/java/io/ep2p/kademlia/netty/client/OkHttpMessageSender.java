@@ -83,7 +83,7 @@ public class OkHttpMessageSender<K extends Serializable, V extends Serializable>
 
                 @Override
                 public boolean isAlive() {
-                    return !(e instanceof SocketTimeoutException);
+                    return false;
                 }
             };
         }
