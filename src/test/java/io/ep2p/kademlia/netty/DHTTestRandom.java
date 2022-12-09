@@ -35,7 +35,7 @@ public class DHTTestRandom {
         NodeSettings.Default.BUCKET_SIZE = 100;
         NodeSettings.Default.PING_SCHEDULE_TIME_VALUE = 5;
         NodeSettings.Default.PING_SCHEDULE_TIME_UNIT = TimeUnit.SECONDS;
-        keyHashGenerator = BigInteger::new;
+        keyHashGenerator = (k) -> BigInteger.valueOf(1);
     }
 
     @Test
@@ -45,7 +45,6 @@ public class DHTTestRandom {
         for (int i = 1; i < 16; i++){
             NettyKademliaDHTNode<String, String> nettyKademliaDHTNode = new NettyKademliaDHTNodeBuilder<>(
                     BigInteger.valueOf(new Random().nextInt((int) Math.pow(2, NodeSettings.Default.IDENTIFIER_SIZE))),
-//                    BigInteger.valueOf(i),
                     new NettyConnectionInfo("127.0.0.1", NodeHelper.findRandomPort()),
                     new SampleRepository(),
                     keyHashGenerator
@@ -56,13 +55,20 @@ public class DHTTestRandom {
                 Assertions.assertTrue(nettyKademliaDHTNode.start(previousNode).get(5, TimeUnit.SECONDS));
             }
             nodes.add(nettyKademliaDHTNode);
-            Assertions.assertEquals(StoreAnswer.Result.STORED, nettyKademliaDHTNode.store(nettyKademliaDHTNode.getId().toString(), "data").get(5, TimeUnit.SECONDS).getResult());
             System.out.println("Stored data in " + nettyKademliaDHTNode.getId());
             previousNode = nettyKademliaDHTNode;
         }
 
         System.out.println("Bootstrapped all nodes. Looking up for data");
-        Thread.sleep(5500);
+
+        Thread.sleep(6000);
+        nodes.forEach(kademliaDHTNode -> {
+            try {
+                Assertions.assertEquals(StoreAnswer.Result.STORED, kademliaDHTNode.store(kademliaDHTNode.getId().toString(), "data").get(5, TimeUnit.SECONDS).getResult());
+            } catch (InterruptedException | DuplicateStoreRequest | ExecutionException | TimeoutException e) {
+                e.printStackTrace();
+            }
+        });
 
         nodes.forEach(kademliaDHTNode -> {
             nodes.forEach(otherNode -> {
