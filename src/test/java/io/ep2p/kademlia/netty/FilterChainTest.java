@@ -5,13 +5,14 @@ import io.ep2p.kademlia.exception.UnsupportedBoundingException;
 import io.ep2p.kademlia.netty.builder.NettyKademliaDHTNodeBuilder;
 import io.ep2p.kademlia.netty.client.OkHttpMessageSender;
 import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
-import io.ep2p.kademlia.netty.factory.GsonFactory;
 import io.ep2p.kademlia.netty.factory.KademliaMessageHandlerFactory;
-import io.ep2p.kademlia.netty.serialization.GsonMessageSerializer;
+import io.ep2p.kademlia.netty.serialization.NettyGsonMessageSerializer;
 import io.ep2p.kademlia.netty.server.filter.KademliaMainHandlerFilter;
 import io.ep2p.kademlia.netty.server.filter.NettyKademliaServerFilter;
 import io.ep2p.kademlia.netty.server.filter.NettyKademliaServerFilterChain;
 import io.ep2p.kademlia.node.KeyHashGenerator;
+import io.ep2p.kademlia.serialization.gson.GsonFactory;
+import io.ep2p.kademlia.serialization.gson.GsonMessageSerializer;
 import io.ep2p.kademlia.util.BoundedHashUtil;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterAll;
@@ -50,15 +51,15 @@ public class FilterChainTest {
             return BigInteger.valueOf(key.hashCode());
         };
 
-        okHttpMessageSender1 = new OkHttpMessageSender<>();
+        okHttpMessageSender1 = new OkHttpMessageSender<>(new NettyGsonMessageSerializer<>(String.class, String.class));
 
         // node 1
         node1 = new NettyKademliaDHTNodeBuilder<>(
                 BigInteger.valueOf(1L),
                 new NettyConnectionInfo("127.0.0.1", NodeHelper.findRandomPort()),
                 new SampleRepository(),
-                keyHashGenerator
-        ).build();
+                keyHashGenerator,
+                String.class, String.class).build();
         node1.start();
 
     }
@@ -76,7 +77,7 @@ public class FilterChainTest {
 
         NettyKademliaServerFilterChain<String, String> filterChain = new NettyKademliaServerFilterChain<>();
         filterChain.addFilter(new EmptyFilter());
-        filterChain.addFilter(new KademliaMainHandlerFilter<>(new GsonMessageSerializer<>(new GsonFactory.DefaultGsonFactory<>().gsonBuilder())));
+        filterChain.addFilter(new KademliaMainHandlerFilter<>(new GsonMessageSerializer<>(new GsonFactory.DefaultGsonFactory<>(BigInteger.class, NettyConnectionInfo.class, String.class, String.class).gsonBuilder())));
         filterChain.addFilterAfter(EmptyFilter.class, mockFilter);
 
 
@@ -84,8 +85,8 @@ public class FilterChainTest {
                 BigInteger.valueOf(2L),
                 new NettyConnectionInfo("127.0.0.1", NodeHelper.findRandomPort()),
                 new SampleRepository(),
-                node1.getKeyHashGenerator()
-        )
+                node1.getKeyHashGenerator(),
+                String.class, String.class)
                 .kademliaMessageHandlerFactory(new KademliaMessageHandlerFactory.DefaultKademliaMessageHandlerFactory<>(filterChain))
                 .build();
         System.out.println("Bootstrapped? " + node2.start(node1).get(5, TimeUnit.SECONDS));

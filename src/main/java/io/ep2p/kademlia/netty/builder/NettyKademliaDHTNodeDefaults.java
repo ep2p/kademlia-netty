@@ -3,13 +3,13 @@ package io.ep2p.kademlia.netty.builder;
 import io.ep2p.kademlia.NodeSettings;
 import io.ep2p.kademlia.netty.client.OkHttpMessageSender;
 import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
-import io.ep2p.kademlia.netty.factory.GsonFactory;
 import io.ep2p.kademlia.netty.factory.KademliaMessageHandlerFactory;
 import io.ep2p.kademlia.netty.factory.NettyServerInitializerFactory;
-import io.ep2p.kademlia.netty.serialization.GsonMessageSerializer;
 import io.ep2p.kademlia.netty.server.KademliaNodeServer;
 import io.ep2p.kademlia.netty.server.filter.KademliaMainHandlerFilter;
 import io.ep2p.kademlia.netty.server.filter.NettyKademliaServerFilterChain;
+import io.ep2p.kademlia.serialization.gson.GsonFactory;
+import io.ep2p.kademlia.serialization.gson.GsonMessageSerializer;
 import io.ep2p.kademlia.table.Bucket;
 import io.ep2p.kademlia.table.DefaultRoutingTableFactory;
 import io.ep2p.kademlia.table.RoutingTableFactory;
@@ -50,13 +50,13 @@ public class NettyKademliaDHTNodeDefaults {
 
         pipelines.add(builder -> {
             if (builder.getGsonFactory() == null) {
-                builder.gsonFactory(new GsonFactory.DefaultGsonFactory<>());
+                builder.gsonFactory(new GsonFactory.DefaultGsonFactory<BigInteger, NettyConnectionInfo, K, V>(BigInteger.class, NettyConnectionInfo.class, builder.getKeyClass(), builder.getValueClass()));
             }
         });
 
         pipelines.add(builder -> {
             if (builder.getMessageSender() == null) {
-                builder.messageSender( new OkHttpMessageSender<>(new GsonMessageSerializer<>(builder.getGsonFactory().gsonBuilder())));
+                builder.messageSender( new OkHttpMessageSender<>(new GsonMessageSerializer<BigInteger, NettyConnectionInfo, K, V>(builder.getGsonFactory().gsonBuilder())));
             }
         });
 

@@ -3,7 +3,6 @@ package io.ep2p.kademlia.netty.examples;
 import lombok.*;
 
 import java.io.Serializable;
-import java.math.BigInteger;
 
 
 @Data

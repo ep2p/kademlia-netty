@@ -2,7 +2,6 @@ package io.ep2p.kademlia.netty;
 
 
 import io.ep2p.kademlia.NodeSettings;
-import io.ep2p.kademlia.exception.DuplicateStoreRequest;
 import io.ep2p.kademlia.model.LookupAnswer;
 import io.ep2p.kademlia.model.StoreAnswer;
 import io.ep2p.kademlia.netty.builder.NettyKademliaDHTNodeBuilder;
@@ -39,7 +38,7 @@ public class DHTTestRandom {
     }
 
     @Test
-    void testDHTStoreRandomKeys() throws IOException, ExecutionException, InterruptedException, TimeoutException, DuplicateStoreRequest {
+    void testDHTStoreRandomKeys() throws IOException, ExecutionException, InterruptedException, TimeoutException {
 
         NettyKademliaDHTNode<String, String> previousNode = null;
         for (int i = 1; i < 16; i++){
@@ -47,8 +46,8 @@ public class DHTTestRandom {
                     BigInteger.valueOf(new Random().nextInt((int) Math.pow(2, NodeSettings.Default.IDENTIFIER_SIZE))),
                     new NettyConnectionInfo("127.0.0.1", NodeHelper.findRandomPort()),
                     new SampleRepository(),
-                    keyHashGenerator
-            ).build();
+                    keyHashGenerator,
+                    String.class, String.class).build();
             if (previousNode == null){
                 nettyKademliaDHTNode.start();
             }else {
@@ -65,7 +64,7 @@ public class DHTTestRandom {
         nodes.forEach(kademliaDHTNode -> {
             try {
                 Assertions.assertEquals(StoreAnswer.Result.STORED, kademliaDHTNode.store(kademliaDHTNode.getId().toString(), "data").get(5, TimeUnit.SECONDS).getResult());
-            } catch (InterruptedException | DuplicateStoreRequest | ExecutionException | TimeoutException e) {
+            } catch (InterruptedException | ExecutionException | TimeoutException e) {
                 e.printStackTrace();
             }
         });
@@ -73,9 +72,9 @@ public class DHTTestRandom {
         nodes.forEach(kademliaDHTNode -> {
             nodes.forEach(otherNode -> {
                 try {
-                    LookupAnswer<BigInteger, String, String> lookupAnswer = kademliaDHTNode.lookup(otherNode.getId().toString()).get(10, TimeUnit.SECONDS);
+                    LookupAnswer<BigInteger, NettyConnectionInfo, String, String> lookupAnswer = kademliaDHTNode.lookup(otherNode.getId().toString()).get(10, TimeUnit.SECONDS);
                     Assertions.assertEquals(LookupAnswer.Result.FOUND, lookupAnswer.getResult(), kademliaDHTNode.getId() + " couldn't find key " + otherNode.getId());
-                    System.out.println("Requester: " + kademliaDHTNode.getId() + " - Key: " + otherNode.getId() + " - Owner: " + lookupAnswer.getNodeId());
+                    System.out.println("Requester: " + kademliaDHTNode.getId() + " - Key: " + otherNode.getId() + " - Owner: " + lookupAnswer.getNode().getId());
                 } catch (InterruptedException | ExecutionException | TimeoutException e) {
                     e.printStackTrace();
                 }

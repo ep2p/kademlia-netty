@@ -6,7 +6,7 @@
 
     <groupId>io.ep2p</groupId>
     <artifactId>kademlia-netty</artifactId>
-    <version>0.1.10-RELEASE</version>
+    <version>0.2.0-RELEASE</version>
     <url>https://github.com/ep2p/kademlia-netty</url>
     <name>Kademlia API over Netty</name>
     <description>Java library for kademlia API netty as server, OKHttp as client and Gson as serializer.</description>
@@ -46,19 +46,19 @@
         <dependency>
             <groupId>io.ep2p</groupId>
             <artifactId>kademlia-api</artifactId>
-            <version>4.1.18-RELEASE</version>
+            <version>5.0.2-RELEASE</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.ep2p</groupId>
+            <artifactId>kademlia-serialization-gson</artifactId>
+            <version>1.0.1-RELEASE</version>
         </dependency>
 
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
             <version>4.1.84.Final</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.9.0</version>
         </dependency>
 
         <dependency>
@@ -98,7 +98,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>2.0.3</version>
+            <version>2.0.5</version>
         </dependency>
 
     </dependencies>

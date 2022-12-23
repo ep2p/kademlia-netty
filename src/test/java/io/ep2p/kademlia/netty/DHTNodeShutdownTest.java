@@ -41,23 +41,23 @@ public class DHTNodeShutdownTest {
                 BigInteger.valueOf(1L),
                 new NettyConnectionInfo("127.0.0.1", 8000),
                 new SampleRepository(),
-                keyHashGenerator
-        ).build();
+                keyHashGenerator,
+                String.class, String.class).build();
         node1.start();
 
         NettyKademliaDHTNode<String, String> node2 = new NettyKademliaDHTNodeBuilder<>(
                 BigInteger.valueOf(2L),
                 new NettyConnectionInfo("127.0.0.1", 8001),
                 new SampleRepository(),
-                keyHashGenerator
-        ).build();
+                keyHashGenerator,
+                String.class, String.class).build();
         node2.start(node1).get();
 
         Thread.sleep(2000);
-        StoreAnswer<BigInteger, String> storeAnswer = node1.store("1", "1").get();
+        StoreAnswer<BigInteger, NettyConnectionInfo, String> storeAnswer = node1.store("1", "1").get();
         Assertions.assertEquals(StoreAnswer.Result.STORED, storeAnswer.getResult());
 
-        LookupAnswer<BigInteger, String, String> lookupAnswer = node1.lookup("1").get();
+        LookupAnswer<BigInteger, NettyConnectionInfo, String, String> lookupAnswer = node1.lookup("1").get();
         System.out.printf("A Lookup result: %s - Value: %s%n", lookupAnswer.getResult(), lookupAnswer.getValue());
         Assertions.assertEquals(LookupAnswer.Result.FOUND, lookupAnswer.getResult());
 

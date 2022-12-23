@@ -2,19 +2,17 @@ package io.ep2p.kademlia.netty.client;
 
 import io.ep2p.kademlia.connection.MessageSender;
 import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
-import io.ep2p.kademlia.netty.serialization.GsonMessageSerializer;
-import io.ep2p.kademlia.netty.serialization.MessageSerializer;
 import io.ep2p.kademlia.node.KademliaNodeAPI;
 import io.ep2p.kademlia.node.Node;
 import io.ep2p.kademlia.protocol.MessageType;
 import io.ep2p.kademlia.protocol.message.KademliaMessage;
+import io.ep2p.kademlia.serialization.api.MessageSerializer;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.net.SocketTimeoutException;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -24,11 +22,11 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class OkHttpMessageSender<K extends Serializable, V extends Serializable> implements MessageSender<BigInteger, NettyConnectionInfo> {
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
-    private final MessageSerializer messageSerializer;
+    private final MessageSerializer<BigInteger, NettyConnectionInfo> messageSerializer;
     private final OkHttpClient client;
     private final ExecutorService executorService;
 
-    public OkHttpMessageSender(MessageSerializer messageSerializer, ExecutorService executorService) {
+    public OkHttpMessageSender(MessageSerializer<BigInteger, NettyConnectionInfo> messageSerializer, ExecutorService executorService) {
         this.messageSerializer = messageSerializer;
         this.executorService = executorService;
         this.client = new OkHttpClient.Builder()
@@ -38,16 +36,8 @@ public class OkHttpMessageSender<K extends Serializable, V extends Serializable>
                 .build();
     }
 
-    public OkHttpMessageSender(MessageSerializer messageSerializer) {
+    public OkHttpMessageSender(MessageSerializer<BigInteger, NettyConnectionInfo> messageSerializer) {
         this(messageSerializer, Executors.newSingleThreadExecutor());
-    }
-
-    public OkHttpMessageSender(ExecutorService executorService){
-        this(new GsonMessageSerializer<K, V>(), executorService);
-    }
-
-    public OkHttpMessageSender() {
-        this(new GsonMessageSerializer<K, V>());
     }
 
     @Override

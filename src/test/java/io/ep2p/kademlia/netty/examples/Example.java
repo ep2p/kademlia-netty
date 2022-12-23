@@ -40,8 +40,8 @@ public class Example {
                 BigInteger.valueOf(1L),
                 new NettyConnectionInfo("127.0.0.1", 8000),
                 new SampleRepository(),
-                keyHashGenerator
-        ).build();
+                keyHashGenerator,
+                String.class, String.class).build();
         node1.start();
 
 
@@ -50,18 +50,18 @@ public class Example {
                 BigInteger.valueOf(2L),
                 new NettyConnectionInfo("127.0.0.1", 8001),
                 new SampleRepository(),
-                keyHashGenerator
-        ).build();
+                keyHashGenerator,
+                String.class, String.class).build();
         node2.start(node1).get();  // Wait till bootstrap future finishes
 
 
         // Store a value in DHT through node 1 (in this case, a key with name "K" will definitely get stored in node 2)
-        StoreAnswer<BigInteger, String> storeAnswer = node2.store("K", "V").get();
-        System.out.printf("Store result: %s - Node: %s%n", storeAnswer.getResult(), storeAnswer.getNodeId());
+        StoreAnswer<BigInteger, NettyConnectionInfo, String> storeAnswer = node2.store("K", "V").get();
+        System.out.printf("Store result: %s - Node: %s%n", storeAnswer.getResult(), storeAnswer.getNode().getId());
         System.out.printf("Data in node 2: %s%n", node2.getKademliaRepository().get("K"));
 
         // Retrieve the value of key "K" through node 1
-        LookupAnswer<BigInteger, String, String> lookupAnswer = node1.lookup("K").get();
+        LookupAnswer<BigInteger, NettyConnectionInfo, String, String> lookupAnswer = node1.lookup("K").get();
         System.out.printf("Lookup result: %s - Value: %s%n", lookupAnswer.getResult(), lookupAnswer.getValue());
 
         for (int i = 0; i < 100; i++){

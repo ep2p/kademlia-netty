@@ -4,14 +4,13 @@ import io.ep2p.kademlia.NodeSettings;
 import io.ep2p.kademlia.connection.MessageSender;
 import io.ep2p.kademlia.netty.NettyKademliaDHTNode;
 import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
-import io.ep2p.kademlia.netty.factory.GsonFactory;
 import io.ep2p.kademlia.netty.factory.KademliaMessageHandlerFactory;
 import io.ep2p.kademlia.netty.factory.NettyServerInitializerFactory;
 import io.ep2p.kademlia.netty.server.KademliaNodeServer;
-import io.ep2p.kademlia.node.DHTKademliaNode;
-import io.ep2p.kademlia.node.DHTKademliaNodeAPI;
 import io.ep2p.kademlia.node.KeyHashGenerator;
+import io.ep2p.kademlia.node.builder.DHTKademliaNodeBuilder;
 import io.ep2p.kademlia.repository.KademliaRepository;
+import io.ep2p.kademlia.serialization.gson.GsonFactory;
 import io.ep2p.kademlia.table.Bucket;
 import io.ep2p.kademlia.table.RoutingTable;
 import lombok.Getter;
@@ -35,14 +34,18 @@ public class NettyKademliaDHTNodeBuilder<K extends Serializable, V extends Seria
     private KademliaNodeServer<K, V> kademliaNodeServer;
     private KademliaMessageHandlerFactory<K, V> kademliaMessageHandlerFactory;
     private NettyServerInitializerFactory<K, V> nettyServerInitializerFactory;
+    private final Class<K> keyClass;
+    private final Class<V> valueClass;
 
     protected List<String> required = new ArrayList<>();
 
-    public NettyKademliaDHTNodeBuilder(BigInteger id, NettyConnectionInfo connectionInfo, KademliaRepository<K, V> repository, KeyHashGenerator<BigInteger, K> keyHashGenerator) {
+    public NettyKademliaDHTNodeBuilder(BigInteger id, NettyConnectionInfo connectionInfo, KademliaRepository<K, V> repository, KeyHashGenerator<BigInteger, K> keyHashGenerator, Class<K> keyClass, Class<V> valueClass) {
         this.id = id;
         this.connectionInfo = connectionInfo;
         this.repository = repository;
         this.keyHashGenerator = keyHashGenerator;
+        this.keyClass = keyClass;
+        this.valueClass = valueClass;
     }
 
     public NettyKademliaDHTNodeBuilder<K, V> routingTable(RoutingTable<BigInteger, NettyConnectionInfo, Bucket<BigInteger, NettyConnectionInfo>> routingTable){
@@ -83,15 +86,17 @@ public class NettyKademliaDHTNodeBuilder<K extends Serializable, V extends Seria
     public NettyKademliaDHTNode<K, V> build(){
         fillDefaults();
 
-        DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> kademliaNode = new DHTKademliaNode<>(
+        DHTKademliaNodeBuilder<BigInteger, NettyConnectionInfo, K, V> builder = new DHTKademliaNodeBuilder<>(
                 this.id,
                 this.connectionInfo,
                 this.routingTable,
                 this.messageSender,
-                this.nodeSettings, this.repository, this.keyHashGenerator
+                this.keyHashGenerator,
+                this.repository
         );
+        builder.setNodeSettings(this.nodeSettings);
 
-        return new NettyKademliaDHTNode<>(kademliaNode, this.kademliaNodeServer);
+        return new NettyKademliaDHTNode<>(builder.build(), this.kademliaNodeServer);
     }
 
     protected void fillDefaults() {

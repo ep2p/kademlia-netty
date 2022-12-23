@@ -2,13 +2,13 @@ package io.ep2p.kademlia.netty;
 
 
 import io.ep2p.kademlia.NodeSettings;
-import io.ep2p.kademlia.exception.DuplicateStoreRequest;
 import io.ep2p.kademlia.exception.UnsupportedBoundingException;
 import io.ep2p.kademlia.model.LookupAnswer;
 import io.ep2p.kademlia.model.StoreAnswer;
 import io.ep2p.kademlia.netty.builder.NettyKademliaDHTNodeBuilder;
 import io.ep2p.kademlia.netty.client.OkHttpMessageSender;
 import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
+import io.ep2p.kademlia.netty.serialization.NettyGsonMessageSerializer;
 import io.ep2p.kademlia.node.KeyHashGenerator;
 import io.ep2p.kademlia.util.BoundedHashUtil;
 import lombok.SneakyThrows;
@@ -46,16 +46,16 @@ public class DHTTest {
             return BigInteger.valueOf(key.hashCode());
         };
 
-        okHttpMessageSender1 = new OkHttpMessageSender<>();
-        okHttpMessageSender2 = new OkHttpMessageSender<>();
+        okHttpMessageSender1 = new OkHttpMessageSender<>(new NettyGsonMessageSerializer<>(String.class, String.class));
+        okHttpMessageSender2 = new OkHttpMessageSender<>(new NettyGsonMessageSerializer<>(String.class, String.class));
 
         // node 1
         node1 = new NettyKademliaDHTNodeBuilder<>(
                 BigInteger.valueOf(1L),
                 new NettyConnectionInfo("127.0.0.1", NodeHelper.findRandomPort()),
                 new SampleRepository(),
-                keyHashGenerator
-        ).build();
+                keyHashGenerator,
+                String.class, String.class).build();
         node1.start();
 
 
@@ -64,8 +64,8 @@ public class DHTTest {
                 BigInteger.valueOf(2L),
                 new NettyConnectionInfo("127.0.0.1", NodeHelper.findRandomPort()),
                 new SampleRepository(),
-                keyHashGenerator
-        ).build();
+                keyHashGenerator,
+                String.class, String.class).build();
         System.out.println("Bootstrapped? " + node2.start(node1).get(5, TimeUnit.SECONDS));
 
     }
@@ -79,22 +79,22 @@ public class DHTTest {
     }
 
     @Test
-    void testDhtStoreLookup() throws DuplicateStoreRequest, ExecutionException, InterruptedException {
+    void testDhtStoreLookup() throws  ExecutionException, InterruptedException {
         String[] values = new String[]{"V", "ABC", "SOME VALUE"};
         for (String v : values){
             System.out.println("Testing DHT for K: " + v.hashCode() + " & V: " + v);
-            StoreAnswer<BigInteger, String> storeAnswer = node2.store("" + v.hashCode(), v).get();
+            StoreAnswer<BigInteger, NettyConnectionInfo, String> storeAnswer = node2.store("" + v.hashCode(), v).get();
             Assertions.assertEquals(StoreAnswer.Result.STORED, storeAnswer.getResult());
-            System.out.println(storeAnswer.getNodeId() + " stored data");
-            LookupAnswer<BigInteger, String, String> lookupAnswer = node1.lookup("" + v.hashCode()).get();
-            System.out.println("Node " + node1.getId() + " found " + v.hashCode() + " from " + lookupAnswer.getNodeId());
+            System.out.println(storeAnswer.getNode().getId() + " stored data");
+            LookupAnswer<BigInteger, NettyConnectionInfo, String, String> lookupAnswer = node1.lookup("" + v.hashCode()).get();
+            System.out.println("Node " + node1.getId() + " found " + v.hashCode() + " from " + lookupAnswer.getNode().getId());
             Assertions.assertEquals(LookupAnswer.Result.FOUND, lookupAnswer.getResult());
             Assertions.assertEquals(lookupAnswer.getValue(), v);
 
             lookupAnswer = node2.lookup("" + v.hashCode()).get();
             Assertions.assertEquals(LookupAnswer.Result.FOUND, lookupAnswer.getResult());
             Assertions.assertEquals(v, lookupAnswer.getValue());
-            System.out.println("Node " + node2.getId() + " found " + v.hashCode() + " from " + lookupAnswer.getNodeId());
+            System.out.println("Node " + node2.getId() + " found " + v.hashCode() + " from " + lookupAnswer.getNode().getId());
         }
 
     }
