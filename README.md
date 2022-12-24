@@ -4,8 +4,8 @@
 [![Liscence](https://badgen.net/github/license/ep2p/kademlia-netty)](https://github.com/ep2p/kademlia-netty/blob/main/LICENSE)
 
 # kademlia netty
-
-**This Project is still under maintenance** 
+**Status**: ready to use. active maintainance.
+---
 
 Implementation of [kademlia API](https://github.com/ep2p/kademlia-api) DHT using:
 
@@ -49,7 +49,7 @@ Using maven:
 <dependency>
     <groupId>io.ep2p</groupId>
     <artifactId>kademlia-netty</artifactId>
-    <version>0.1.8-RELEASE</version>
+    <version>0.3.0-RELEASE</version>
 </dependency>
 ```
 
