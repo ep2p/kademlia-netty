@@ -9,9 +9,9 @@
 
 Implementation of [kademlia API](https://github.com/ep2p/kademlia-api) DHT using:
 
-- Netty (as server for each node, including [`ConnectionInfo`](https://github.com/ep2p/kademlia-api#connectioninfo))
+- Netty (as HTTP/1.1 server for each node, including [`ConnectionInfo`](https://github.com/ep2p/kademlia-api#connectioninfo) with `host` and `port`)
 - OKHttp (as [`RequestSender`](https://github.com/ep2p/kademlia-api#messagesender-interface) implementation)
-- Gson (as serializer/deserializer)
+- ([Kademlia Gson Serialization](https://github.com/ep2p/kademlia-serialization-gson))
 
 This library uses `BigInteger` as Node IDs and `NettyConnectionInfo` as implementation of `ConnectionInfo` interafce.
 
