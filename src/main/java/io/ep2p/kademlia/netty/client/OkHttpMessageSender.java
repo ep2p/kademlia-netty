@@ -13,6 +13,7 @@ import okhttp3.*;
 import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -27,13 +28,24 @@ public class OkHttpMessageSender<K extends Serializable, V extends Serializable>
     private final ExecutorService executorService;
 
     public OkHttpMessageSender(MessageSerializer<BigInteger, NettyConnectionInfo> messageSerializer, ExecutorService executorService) {
-        this.messageSerializer = messageSerializer;
-        this.executorService = executorService;
-        this.client = new OkHttpClient.Builder()
+        this(messageSerializer, executorService, new OkHttpClient.Builder()
                 .connectTimeout(5, TimeUnit.SECONDS)
                 .readTimeout(10, TimeUnit.SECONDS)
                 .writeTimeout(10, TimeUnit.SECONDS)
-                .build();
+//                .protocols(Collections.singletonList(Protocol.HTTP_1_1))
+//                .retryOnConnectionFailure(true)
+//                .connectionPool(new ConnectionPool(64, 1, TimeUnit.MINUTES))
+                .build());
+    }
+
+    public OkHttpMessageSender(MessageSerializer<BigInteger, NettyConnectionInfo> messageSerializer, ExecutorService executorService, OkHttpClient client) {
+        this.messageSerializer = messageSerializer;
+        this.executorService = executorService;
+        this.client = client;
+    }
+
+    public OkHttpMessageSender(MessageSerializer<BigInteger, NettyConnectionInfo> messageSerializer, OkHttpClient client) {
+        this(messageSerializer, Executors.newSingleThreadExecutor(), client);
     }
 
     public OkHttpMessageSender(MessageSerializer<BigInteger, NettyConnectionInfo> messageSerializer) {
@@ -49,7 +61,6 @@ public class OkHttpMessageSender<K extends Serializable, V extends Serializable>
                 .url(String.format("http://%s:%d/", receiver.getConnectionInfo().getHost(), receiver.getConnectionInfo().getPort()))
                 .post(body)
                 .build();
-
         try (Response response = client.newCall(request).execute()) {
             String responseStr = Objects.requireNonNull(response.body()).string();
             return messageSerializer.deserialize(responseStr);

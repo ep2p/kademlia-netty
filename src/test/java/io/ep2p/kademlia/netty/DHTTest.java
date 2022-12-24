@@ -74,8 +74,8 @@ public class DHTTest {
     public static void cleanup(){
         okHttpMessageSender1.stop();
         okHttpMessageSender2.stop();
-        node1.stop();
-        node2.stop();
+        node1.stopNow();
+        node2.stopNow();
     }
 
     @Test

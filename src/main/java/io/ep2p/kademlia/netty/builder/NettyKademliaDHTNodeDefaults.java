@@ -3,11 +3,9 @@ package io.ep2p.kademlia.netty.builder;
 import io.ep2p.kademlia.NodeSettings;
 import io.ep2p.kademlia.netty.client.OkHttpMessageSender;
 import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
-import io.ep2p.kademlia.netty.factory.KademliaMessageHandlerFactory;
-import io.ep2p.kademlia.netty.factory.NettyServerInitializerFactory;
+import io.ep2p.kademlia.netty.factory.NettyChannelInboundHandlerFactory;
+import io.ep2p.kademlia.netty.factory.NettyChannelInitializerFactory;
 import io.ep2p.kademlia.netty.server.KademliaNodeServer;
-import io.ep2p.kademlia.netty.server.filter.KademliaMainHandlerFilter;
-import io.ep2p.kademlia.netty.server.filter.NettyKademliaServerFilterChain;
 import io.ep2p.kademlia.serialization.gson.GsonFactory;
 import io.ep2p.kademlia.serialization.gson.GsonMessageSerializer;
 import io.ep2p.kademlia.table.Bucket;
@@ -55,26 +53,35 @@ public class NettyKademliaDHTNodeDefaults {
         });
 
         pipelines.add(builder -> {
+            if (builder.getMessageSerializer() == null){
+                builder.messageSerializer(new GsonMessageSerializer<BigInteger, NettyConnectionInfo, K, V>(builder.getGsonFactory().gsonBuilder()));
+            }
+        });
+
+        pipelines.add(builder -> {
             if (builder.getMessageSender() == null) {
-                builder.messageSender( new OkHttpMessageSender<>(new GsonMessageSerializer<BigInteger, NettyConnectionInfo, K, V>(builder.getGsonFactory().gsonBuilder())));
+                if (builder.getOkHttpClient() == null)
+                    builder.messageSender( new OkHttpMessageSender<>(builder.getMessageSerializer()));
+                else
+                    builder.messageSender( new OkHttpMessageSender<>(builder.getMessageSerializer(), builder.getOkHttpClient()));
             }
         });
 
         pipelines.add(builder -> {
-            if (builder.getKademliaMessageHandlerFactory() == null) {
-                NettyKademliaServerFilterChain<K, V> filterChain = new NettyKademliaServerFilterChain<>();
-                filterChain.addFilter(new KademliaMainHandlerFilter<>(new GsonMessageSerializer<>(builder.getGsonFactory().gsonBuilder())));
-                builder.kademliaMessageHandlerFactory(new KademliaMessageHandlerFactory.DefaultKademliaMessageHandlerFactory<>(filterChain));
+            if (builder.getNettyChannelInboundHandlerFactory() == null) {
+                builder.nettyChannelInboundHandlerFactory(new NettyChannelInboundHandlerFactory.DefaultNettyChannelInboundHandlerFactory());
             }
         });
 
         pipelines.add(builder -> {
-            if (builder.getNettyServerInitializerFactory() == null) {
-                builder.nettyServerInitializerFactory(
-                        new NettyServerInitializerFactory.DefaultNettyServerInitializerFactory<>(
-                                builder.getKademliaMessageHandlerFactory()
-                        )
-                );
+            if (builder.getNettyKademliaMessageHandlerFactoryProvider() == null) {
+                builder.nettyKademliaMessageHandlerFactoryProvider(new NettyKademliaMessageHandlerFactoryProvider.DefaultNettyKademliaMessageHandlerFactoryProvider());
+            }
+        });
+
+        pipelines.add(builder -> {
+            if (builder.getNettyChannelInitializerFactory() == null) {
+                builder.nettyChannelInitializerFactory(new NettyChannelInitializerFactory.DefaultNettyChannelInitializerFactory());
             }
         });
 
@@ -84,7 +91,9 @@ public class NettyKademliaDHTNodeDefaults {
                         new KademliaNodeServer<>(
                                 builder.getConnectionInfo().getHost(),
                                 builder.getConnectionInfo().getPort(),
-                                builder.getNettyServerInitializerFactory()
+                                builder.getNettyChannelInitializerFactory(),
+                                builder.getNettyChannelInboundHandlerFactory(),
+                                builder.getNettyKademliaMessageHandlerFactoryProvider().getNettyKademliaMessageHandlerFactory(builder)
                         )
                 );
             }

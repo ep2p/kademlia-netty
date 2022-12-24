@@ -48,6 +48,6 @@ public class NettyKademliaDHTNode<K extends Serializable, V extends Serializable
     @SneakyThrows
     public void stopNow(){
         super.stopNow();
-        kademliaNodeServer.stop();
+        kademliaNodeServer.stopNow();
     }
 }

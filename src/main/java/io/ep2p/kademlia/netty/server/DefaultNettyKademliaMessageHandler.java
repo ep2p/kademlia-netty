@@ -1,11 +1,12 @@
-package io.ep2p.kademlia.netty.server.filter;
-
+package io.ep2p.kademlia.netty.server;
 
 import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
+import io.ep2p.kademlia.node.DHTKademliaNodeAPI;
 import io.ep2p.kademlia.protocol.message.KademliaMessage;
 import io.ep2p.kademlia.serialization.api.MessageSerializer;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.util.CharsetUtil;
@@ -22,23 +23,25 @@ import static io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST;
 
 
 @Slf4j
-public class KademliaMainHandlerFilter<K extends Serializable, V extends Serializable> extends NettyKademliaServerFilter<K, V> {
+public class DefaultNettyKademliaMessageHandler<K extends Serializable, V extends Serializable> implements NettyKademliaMessageHandler {
 
+    private final DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI;
     private final MessageSerializer<BigInteger, NettyConnectionInfo> messageSerializer;
 
-    public KademliaMainHandlerFilter(MessageSerializer<BigInteger, NettyConnectionInfo> messageSerializer) {
+    public DefaultNettyKademliaMessageHandler(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> dhtKademliaNodeAPI, MessageSerializer<BigInteger, NettyConnectionInfo> messageSerializer) {
+        this.dhtKademliaNodeAPI = dhtKademliaNodeAPI;
         this.messageSerializer = messageSerializer;
     }
 
     @Override
-    public void filter(Context<K, V> context, FullHttpRequest request, FullHttpResponse response) {
+    public void handle(ChannelHandlerContext context, FullHttpRequest request, FullHttpResponse response) {
         KademliaMessage<BigInteger, NettyConnectionInfo, ? extends Serializable> responseMessage = null;
         try {
             KademliaMessage<BigInteger, NettyConnectionInfo, Serializable> kademliaMessage = this.toKademliaMessage(
                     this.parseJsonRequest(request)
             );
-            responseMessage = context.getDhtKademliaNodeApi().onMessage(kademliaMessage);
-            responseMessage.setNode(context.getDhtKademliaNodeApi());
+            responseMessage = this.dhtKademliaNodeAPI.onMessage(kademliaMessage);
+            responseMessage.setNode(this.dhtKademliaNodeAPI);
         } catch (Exception e){
             log.error("Failed to parse request and pass it to the node api", e);
             response.setStatus(BAD_REQUEST);
@@ -51,8 +54,6 @@ public class KademliaMainHandlerFilter<K extends Serializable, V extends Seriali
         response.headers()
                 .set(CONTENT_TYPE, APPLICATION_JSON)
                 .setInt(CONTENT_LENGTH, response.content().readableBytes());
-
-        super.filter(context, request, response);
     }
 
     protected String parseJsonRequest(FullHttpRequest request){
