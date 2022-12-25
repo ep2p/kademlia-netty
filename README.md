@@ -50,7 +50,7 @@ Using maven:
 <dependency>
     <groupId>io.ep2p</groupId>
     <artifactId>kademlia-netty</artifactId>
-    <version>0.3.0-RELEASE</version>
+    <version>0.3.2-RELEASE</version>
 </dependency>
 ```
 
