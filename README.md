@@ -4,7 +4,8 @@
 [![Liscence](https://badgen.net/github/license/ep2p/kademlia-netty)](https://github.com/ep2p/kademlia-netty/blob/main/LICENSE)
 
 # kademlia netty
-**Status**: ready to use. active maintainance.
+**Status**: [ready to use]. [active maintainance].
+Playground (sample runnable project) [available here](https://github.com/ep2p/kademlia-netty-standalone-test).
 
 ---
 
