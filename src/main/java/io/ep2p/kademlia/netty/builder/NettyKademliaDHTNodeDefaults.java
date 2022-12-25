@@ -81,7 +81,7 @@ public class NettyKademliaDHTNodeDefaults {
 
         pipelines.add(builder -> {
             if (builder.getNettyChannelInitializerFactory() == null) {
-                builder.nettyChannelInitializerFactory(new NettyChannelInitializerFactory.DefaultNettyChannelInitializerFactory());
+                builder.nettyChannelInitializerFactory(new NettyChannelInitializerFactory.DefaultNettyChannelInitializerFactory(builder.getSslContext()));
             }
         });
 

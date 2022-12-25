@@ -15,6 +15,7 @@ import io.ep2p.kademlia.serialization.api.MessageSerializer;
 import io.ep2p.kademlia.serialization.gson.GsonFactory;
 import io.ep2p.kademlia.table.Bucket;
 import io.ep2p.kademlia.table.RoutingTable;
+import io.netty.handler.ssl.SslContext;
 import lombok.Getter;
 import okhttp3.OkHttpClient;
 
@@ -40,6 +41,7 @@ public class NettyKademliaDHTNodeBuilder<K extends Serializable, V extends Seria
     private NettyKademliaMessageHandlerFactoryProvider nettyKademliaMessageHandlerFactoryProvider;
     private NettyChannelInboundHandlerFactory nettyChannelInboundHandlerFactory;
     private NettyChannelInitializerFactory nettyChannelInitializerFactory;
+    private SslContext sslContext;
 
     public NettyKademliaDHTNodeBuilder(BigInteger id, NettyConnectionInfo connectionInfo, KademliaRepository<K, V> repository, KeyHashGenerator<BigInteger, K> keyHashGenerator, Class<K> keyClass, Class<V> valueClass) {
         this.id = id;
@@ -97,6 +99,11 @@ public class NettyKademliaDHTNodeBuilder<K extends Serializable, V extends Seria
 
     public NettyKademliaDHTNodeBuilder<K, V> nettyChannelInitializerFactory(NettyChannelInitializerFactory nettyChannelInitializerFactory){
         this.nettyChannelInitializerFactory = nettyChannelInitializerFactory;
+        return this;
+    }
+
+    public NettyKademliaDHTNodeBuilder<K, V> sslContext(SslContext sslContext){
+        this.sslContext = sslContext;
         return this;
     }
 
