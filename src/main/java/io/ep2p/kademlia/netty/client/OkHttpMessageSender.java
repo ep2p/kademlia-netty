@@ -32,9 +32,9 @@ public class OkHttpMessageSender<K extends Serializable, V extends Serializable>
                 .connectTimeout(5, TimeUnit.SECONDS)
                 .readTimeout(10, TimeUnit.SECONDS)
                 .writeTimeout(10, TimeUnit.SECONDS)
-//                .protocols(Collections.singletonList(Protocol.HTTP_1_1))
-//                .retryOnConnectionFailure(true)
-//                .connectionPool(new ConnectionPool(64, 1, TimeUnit.MINUTES))
+                .protocols(Collections.singletonList(Protocol.HTTP_1_1))
+                .retryOnConnectionFailure(true)
+                .connectionPool(new ConnectionPool(64, 1, TimeUnit.MINUTES))
                 .build());
     }
 
