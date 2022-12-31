@@ -64,12 +64,6 @@ public class Example {
         LookupAnswer<BigInteger, NettyConnectionInfo, String, String> lookupAnswer = node1.lookup("K").get();
         System.out.printf("Lookup result: %s - Value: %s%n", lookupAnswer.getResult(), lookupAnswer.getValue());
 
-        for (int i = 0; i < 100; i++){
-            System.out.println("Looking up");
-            lookupAnswer = node2.lookup("1").get();
-            System.out.printf("Lookup result: %s - Value: %s%n", lookupAnswer.getResult(), lookupAnswer.getValue());
-            Thread.sleep(500);
-        }
         node1.stopNow();
         node2.stopNow();
 
