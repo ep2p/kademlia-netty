@@ -23,8 +23,6 @@ import java.util.concurrent.TimeUnit;
 
 public class DHTTest {
 
-    private static OkHttpMessageSender<String, String> okHttpMessageSender1;
-    private static OkHttpMessageSender<String, String> okHttpMessageSender2;
     private static NettyKademliaDHTNode<String, String> node1;
     private static NettyKademliaDHTNode<String, String> node2;
 
@@ -45,9 +43,6 @@ public class DHTTest {
             }
             return BigInteger.valueOf(key.hashCode());
         };
-
-        okHttpMessageSender1 = new OkHttpMessageSender<>(new NettyGsonMessageSerializer<>(String.class, String.class));
-        okHttpMessageSender2 = new OkHttpMessageSender<>(new NettyGsonMessageSerializer<>(String.class, String.class));
 
         // node 1
         node1 = new NettyKademliaDHTNodeBuilder<>(
@@ -72,8 +67,6 @@ public class DHTTest {
 
     @AfterAll
     public static void cleanup(){
-        okHttpMessageSender1.stop();
-        okHttpMessageSender2.stop();
         node1.stopNow();
         node2.stopNow();
     }
@@ -93,6 +86,7 @@ public class DHTTest {
 
             lookupAnswer = node2.lookup("" + v.hashCode()).get();
             Assertions.assertEquals(LookupAnswer.Result.FOUND, lookupAnswer.getResult());
+            Assertions.assertNotNull(lookupAnswer.getValue());
             Assertions.assertEquals(v, lookupAnswer.getValue());
             System.out.println("Node " + node2.getId() + " found " + v.hashCode() + " from " + lookupAnswer.getNode().getId());
         }
