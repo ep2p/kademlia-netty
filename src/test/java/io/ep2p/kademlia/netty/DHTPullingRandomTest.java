@@ -6,7 +6,11 @@ import io.ep2p.kademlia.model.LookupAnswer;
 import io.ep2p.kademlia.model.StoreAnswer;
 import io.ep2p.kademlia.netty.builder.NettyKademliaDHTNodeBuilder;
 import io.ep2p.kademlia.netty.common.NettyConnectionInfo;
+import io.ep2p.kademlia.node.DHTKademliaNodeAPI;
 import io.ep2p.kademlia.node.KeyHashGenerator;
+import io.ep2p.kademlia.services.DHTStoreServiceFactory;
+import io.ep2p.kademlia.services.PullingDHTStoreService;
+import io.ep2p.kademlia.services.PushingDHTStoreService;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -16,12 +20,12 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-public class DHTRandomTest {
+public class DHTPullingRandomTest {
 
     private static KeyHashGenerator<BigInteger, String> keyHashGenerator;
     private static List<NettyKademliaDHTNode<String, String>> nodes = new ArrayList<>();
@@ -43,11 +47,19 @@ public class DHTRandomTest {
         NettyKademliaDHTNode<String, String> previousNode = null;
         for (int i = 1; i < 8; i++){
             NettyKademliaDHTNode<String, String> nettyKademliaDHTNode = new NettyKademliaDHTNodeBuilder<>(
-                    BigInteger.valueOf(new Random().nextInt((int) Math.pow(2, NodeSettings.Default.IDENTIFIER_SIZE))),
+//                    BigInteger.valueOf(new Random().nextInt((int) Math.pow(2, NodeSettings.Default.IDENTIFIER_SIZE))),
+                    BigInteger.valueOf(i),
                     new NettyConnectionInfo("127.0.0.1", NodeHelper.findRandomPort()),
                     new SampleRepository(),
                     keyHashGenerator,
-                    String.class, String.class).build();
+                    String.class, String.class)
+                    .dhtStoreServiceFactory(new DHTStoreServiceFactory<BigInteger, NettyConnectionInfo, String, String>() {
+                        @Override
+                        public PushingDHTStoreService<BigInteger, NettyConnectionInfo, String, String> getDhtStoreService(DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, String, String> kademliaNodeAPI) {
+                            return new PullingDHTStoreService<>(kademliaNodeAPI, Executors.newFixedThreadPool(8));
+                        }
+                    })
+                    .build();
             if (previousNode == null){
                 nettyKademliaDHTNode.start();
             }else {

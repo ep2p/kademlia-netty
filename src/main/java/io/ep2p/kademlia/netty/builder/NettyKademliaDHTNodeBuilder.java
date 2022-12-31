@@ -13,6 +13,8 @@ import io.ep2p.kademlia.node.builder.DHTKademliaNodeBuilder;
 import io.ep2p.kademlia.repository.KademliaRepository;
 import io.ep2p.kademlia.serialization.api.MessageSerializer;
 import io.ep2p.kademlia.serialization.gson.GsonFactory;
+import io.ep2p.kademlia.services.DHTLookupServiceFactory;
+import io.ep2p.kademlia.services.DHTStoreServiceFactory;
 import io.ep2p.kademlia.table.Bucket;
 import io.ep2p.kademlia.table.RoutingTable;
 import io.netty.handler.ssl.SslContext;
@@ -41,6 +43,8 @@ public class NettyKademliaDHTNodeBuilder<K extends Serializable, V extends Seria
     private NettyKademliaMessageHandlerFactoryProvider nettyKademliaMessageHandlerFactoryProvider;
     private NettyChannelInboundHandlerFactory nettyChannelInboundHandlerFactory;
     private NettyChannelInitializerFactory nettyChannelInitializerFactory;
+    private DHTStoreServiceFactory<BigInteger, NettyConnectionInfo, K, V> dhtStoreServiceFactory;
+    private DHTLookupServiceFactory<BigInteger, NettyConnectionInfo, K, V> dhtLookupServiceFactory;
     private SslContext sslContext;
 
     public NettyKademliaDHTNodeBuilder(BigInteger id, NettyConnectionInfo connectionInfo, KademliaRepository<K, V> repository, KeyHashGenerator<BigInteger, K> keyHashGenerator, Class<K> keyClass, Class<V> valueClass) {
@@ -107,6 +111,16 @@ public class NettyKademliaDHTNodeBuilder<K extends Serializable, V extends Seria
         return this;
     }
 
+    public NettyKademliaDHTNodeBuilder<K, V> dhtStoreServiceFactory(DHTStoreServiceFactory<BigInteger, NettyConnectionInfo, K, V> dhtStoreServiceFactory){
+        this.dhtStoreServiceFactory = dhtStoreServiceFactory;
+        return this;
+    }
+
+    private NettyKademliaDHTNodeBuilder<K, V> dhtLookupServiceFactory(DHTLookupServiceFactory<BigInteger, NettyConnectionInfo, K, V> dhtLookupServiceFactory){
+        this.dhtLookupServiceFactory = dhtLookupServiceFactory;
+        return this;
+    }
+
     protected DHTKademliaNodeAPI<BigInteger, NettyConnectionInfo, K, V> buildDHTKademliaNodeAPI(){
         DHTKademliaNodeBuilder<BigInteger, NettyConnectionInfo, K, V> builder = new DHTKademliaNodeBuilder<>(
                 this.id,
@@ -116,6 +130,12 @@ public class NettyKademliaDHTNodeBuilder<K extends Serializable, V extends Seria
                 this.keyHashGenerator,
                 this.repository
         );
+        if (this.getDhtLookupServiceFactory() != null){
+            builder.setDhtLookupServiceFactory(this.getDhtLookupServiceFactory());
+        }
+        if (this.getDhtStoreServiceFactory() != null){
+            builder.setDhtStoreServiceFactory(this.getDhtStoreServiceFactory());
+        }
         return builder.setNodeSettings(this.nodeSettings).build();
     }
 
